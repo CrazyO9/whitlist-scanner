@@ -1,4 +1,5 @@
 .app-root {
+  display:  flex;
   max-width: 960px;
   margin: 0 auto;
   padding: 1.5rem;
@@ -7,6 +8,11 @@
   background: #111827;
   color: #f9fafb;
   min-height: 100vh;
+}
+
+.theme-section {
+  padding-left: .5rem;
+  padding-right: .5rem;
 }
 
 .app-header h1 {
@@ -145,7 +151,7 @@
 .history-table td {
   border: 1px solid #374151;
   padding: 0.4rem 0.5rem;
-  text-align: left;
+  text-align: center;
 }
 
 .history-table th {
@@ -158,4 +164,35 @@
 
 .row-ng {
   background: rgba(248, 113, 113, 0.1);
+}
+
+.tool-section {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.tool-button {
+  padding: 0.4rem 1rem;
+  border-radius: 8px;
+  border: 1px solid #444;
+  background: #222;
+  color: #eee;
+  cursor: pointer;
+}
+
+.delete-row-button {
+  padding: 0.2rem 0.6rem;
+  background: #b91c1c;
+  color: #fefefe;
+  border: none;
+  border-radius: 4px;
+}
+
+.import-ok {
+  color: #fefefe;
+  font-size: 14px;
+  margin-top: 8px;
 }

@@ -1,107 +1,80 @@
-#[cfg_attr(mobile, tauri::mobile_entry_point)]
-pub fn run() {
-  tauri::Builder::default()
-    .setup(|app| {
-      if cfg!(debug_assertions) {
-        app.handle().plugin(
-          tauri_plugin_log::Builder::default()
-            .level(log::LevelFilter::Info)
-            .build(),
-        )?;
-      }
-      Ok(())
-    })
-    .run(tauri::generate_context!())
-    .expect("error while running tauri application");
-}
-use tauri::command;
-use calamine::{open_workbook, Reader, Xlsx};
-use csv::ReaderBuilder;
-use serde::Serialize;
-use std::fs::File;
-use std::io::Read;
+// use serde::Serialize;
+// use csv::ReaderBuilder;
+// use calamine::{open_workbook_auto, Reader, Data};
 
-#[derive(Serialize)]
-pub struct WhiteItem {
-    code: String,
-    name: String,
-}
+// #[derive(Serialize)]
+// pub struct WhiteItem {
+//     pub code: String,
+//     pub name: String,
+// }
 
-#[command]
-pub fn import_whitelist(path: String) -> Result<Vec<WhiteItem>, String> {
-    let lower = path.to_lowercase();
+// #[tauri::command]
+// pub fn import_whitelist(path: String) -> Result<Vec<WhiteItem>, String> {
+//     let lower = path.to_lowercase();
 
-    if lower.ends_with(".csv") {
-        let mut rdr = ReaderBuilder::new()
-            .has_headers(true)
-            .from_path(path)
-            .map_err(|e| e.to_string())?;
+//     // ===== CSV =====
+//     if lower.ends_with(".csv") {
+//         let mut reader = ReaderBuilder::new()
+//             .has_headers(true)
+//             .from_path(&path)
+//             .map_err(|e| e.to_string())?;
 
-        let mut list = vec![];
-        for result in rdr.records() {
-            let record = result.map_err(|e| e.to_string())?;
-            let code = record.get(0).unwrap_or("").to_string();
-            let name = record.get(1).unwrap_or("").to_string();
-            list.push(WhiteItem { code, name });
-        }
-        return Ok(list);
-    }
+//         let mut list = vec![];
 
-    if lower.ends_with(".xlsx") {
-        let mut workbook: Xlsx<_> =
-            open_workbook(path.clone()).map_err(|e| e.to_string())?;
+//         for row in reader.records() {
+//             let r = row.map_err(|e| e.to_string())?;
+//             list.push(WhiteItem {
+//                 code: r.get(0).unwrap_or("").to_string(),
+//                 name: r.get(1).unwrap_or("").to_string(),
+//             });
+//         }
+//         return Ok(list);
+//     }
 
-        let range = workbook
-            .worksheet_range("Sheet1")
-            .ok_or("Excel 中找不到 Sheet1")?
-            .map_err(|e| e.to_string())?;
+//     // ===== XLSX =====
+//     if lower.ends_with(".xlsx") {
+//         let mut workbook = open_workbook_auto(&path)
+//             .map_err(|e| e.to_string())?;
 
-        let mut list = vec![];
+//         // 使用第一個工作表
+//         let sheet = workbook
+//             .sheet_names()
+//             .get(0)
+//             .ok_or("找不到工作表")?
+//             .to_string();
 
-        for row in range.rows().skip(1) {
-            let code = row.get(0).unwrap_or(&calamine::DataType::Empty).to_string();
-            let name = row.get(1).unwrap_or(&calamine::DataType::Empty).to_string();
-            list.push(WhiteItem { code, name });
-        }
+//         // calamine v0.24: worksheet_range 回傳 Result<Range<Data>>
+//         let range = workbook
+//             .worksheet_range(&sheet)
+//             .map_err(|e| e.to_string())?;
 
-        return Ok(list);
-    }
+//         let mut list = vec![];
 
-    Err("只支援 CSV 或 Excel".into())
-}
+//         for row in range.rows().skip(1) {
+//             // calamine v0.24: DataType 改名為 Data
+//             let code = match row.get(0) {
+//                 Some(Data::String(s)) => s.clone(),
+//                 Some(v) => v.to_string(),
+//                 None => "".into(),
+//             };
 
-#[command]
-pub fn export_whitelist(path: String, items: Vec<WhiteItem>) -> Result<(), String> {
-    let mut wtr = csv::Writer::from_path(path).map_err(|e| e.to_string())?;
-    wtr.write_record(&["code", "name"]).map_err(|e| e.to_string())?;
+//             let name = match row.get(1) {
+//                 Some(Data::String(s)) => s.clone(),
+//                 Some(v) => v.to_string(),
+//                 None => "".into(),
+//             };
 
-    for item in items {
-        wtr.write_record(&[item.code, item.name])
-            .map_err(|e| e.to_string())?;
-    }
-    wtr.flush().map_err(|e| e.to_string())?;
+//             list.push(WhiteItem { code, name });
+//         }
 
-    Ok(())
-}
+//         return Ok(list);
+//     }
 
-use notify::{RecommendedWatcher, RecursiveMode, Watcher};
-use std::sync::{Arc, Mutex};
-use tauri::Emitter;
+//     Err("不支援的檔案格式（僅支援 CSV/XLSX）".into())
+// }
 
-#[command]
-pub fn watch_whitelist(app_handle: tauri::AppHandle, path: String) -> Result<(), String> {
-    let handler = move |res: notify::Result<notify::Event>| {
-        if let Ok(_event) = res {
-            let _ = app_handle.emit("whitelist-file-changed", ());
-        }
-    };
-
-    let mut watcher =
-        RecommendedWatcher::new(handler, notify::Config::default()).unwrap();
-
-    watcher
-        .watch(std::path::Path::new(&path), RecursiveMode::NonRecursive)
-        .map_err(|e| e.to_string())?;
-
-    Ok(())
-}
+// #[tauri::command]
+// pub fn watch_whitelist(path: String) -> Result<(), String> {
+//     println!("監控檔案: {}", path);
+//     Ok(())
+// }

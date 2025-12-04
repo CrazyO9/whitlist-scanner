@@ -1,28 +1,29 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
+
   "productName": "whitelist-scanner",
   "version": "0.1.0",
   "identifier": "com.whitelist.scanner",
+
   "build": {
-    "frontendDist": "../dist",
-    "devUrl": "http://localhost:5173",
+    "beforeBuildCommand": "npm run build",
     "beforeDevCommand": "npm run dev",
-    "beforeBuildCommand": "npm run build"
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:5173"
   },
+
   "app": {
     "windows": [
       {
-        "title": "whitelist-scanner",
-        "width": 800,
-        "height": 600,
-        "resizable": true,
-        "fullscreen": false
+        "label": "main",
+        "title": "Whitelist Scanner",
+        "width": 900,
+        "height": 700,
+        "resizable": true
       }
-    ],
-    "security": {
-      "csp": null
-    }
+    ]
   },
+
   "bundle": {
     "active": true,
     "targets": "all",
@@ -33,5 +34,10 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ]
+  },
+
+  "plugins": {
+    "dialog": null,
+    "shell": null
   }
 }
