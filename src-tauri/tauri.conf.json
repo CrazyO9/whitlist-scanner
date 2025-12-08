@@ -1,6 +1,5 @@
 {
-  "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-
+  "$schema": "https://schema.tauri.app/config/2",
   "productName": "whitelist-scanner",
   "version": "0.1.0",
   "identifier": "com.whitelist.scanner",
@@ -34,10 +33,5 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ]
-  },
-
-  "plugins": {
-    "dialog": null,
-    "shell": null
   }
 }

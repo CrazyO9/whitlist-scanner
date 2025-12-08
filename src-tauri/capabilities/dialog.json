@@ -1,10 +1,9 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
-  "identifier": "default",
-  "description": "core + dialog permissions",
+  "identifier": "dialog",
+  "description": "Dialog permissions",
   "windows": ["main"],
   "permissions": [
-    "core:default",
     "dialog:default",
     "dialog:allow-open",
     "dialog:allow-save"
