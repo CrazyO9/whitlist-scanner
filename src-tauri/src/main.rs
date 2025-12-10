@@ -1,6 +1,6 @@
 // src/main.rs
 mod window;
-mod whitelist;
+pub mod whitelist;
 
 use whitelist::import::import_whitelist;
 use whitelist::export::export_whitelist;

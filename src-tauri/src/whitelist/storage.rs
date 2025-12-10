@@ -8,7 +8,7 @@ use tauri::AppHandle;
 
 const UPLOAD_DIR: &str = "upload_file";
 
-fn upload_file_path(app: &AppHandle, file_name: &str) -> Result<PathBuf, String> {
+fn upload_file_path(_app: &AppHandle, file_name: &str) -> Result<PathBuf, String> {
     // 以執行檔所在目錄為基準
     let exe_path = std::env::current_exe().map_err(|e| e.to_string())?;
     let exe_dir = exe_path

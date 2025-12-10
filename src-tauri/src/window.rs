@@ -8,7 +8,7 @@ pub fn setup_main_window<R: tauri::Runtime>(app: &mut tauri::App<R>) -> tauri::R
             let size = monitor.size();
 
             // 粗估 taskbar 高度（可以之後再調整成你覺得舒服的值）
-            let taskbar_height: f64 = 48.0;
+            let taskbar_height: f64 = 70.0;
 
             window.set_size(Size::Logical(LogicalSize {
                 width: window.outer_size()?.width as f64,
