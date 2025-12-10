@@ -1,115 +1,76 @@
-import { useEffect, useRef, useState } from "react";
-import { whitelist as initialList } from "./whitelistData";
+// whitelist-scanner/src/App.jsx
+import React, { useState } from "react";
 import "./App.css";
 
-import ScanInput from "./components/ScanInput";
-import HistoryPanel from "./components/HistoryPanel";
-import ResultPanel from "./components/ResultPanel";
-import ToolBar from "./components/ToolBar";
+import { useWhitelist } from "./hooks/useWhitelist";
+import { useScanHistory } from "./hooks/useScanHistory";
+import { useScanner } from "./hooks/useScanner";
 
-function App() {
-  const [code, setCode] = useState("");
-  const [result, setResult] = useState(null);
-  const [history, setHistory] = useState(() => {
-    try {
-      const raw = localStorage.getItem("scanHistory");
-      return raw ? JSON.parse(raw) : [];
-    } catch {
-      return [];
-    }
+import ToolBar from "./components/ToolBar";
+import ResultPanel from "./components/ResultPanel";
+import HistoryPanel from "./components/HistoryPanel";
+import WhitelistPanel from "./components/WhitelistPanel";
+
+export default function App() {
+  /** --------------------------------------
+   * 1. 初始化 Hook (資料邏輯)
+   * -------------------------------------- */
+  const whitelist = useWhitelist();
+  const history = useScanHistory();
+
+  const scanner = useScanner({
+    findByCode: whitelist.find_by_code,
+    onScanned: history.add_record,
   });
 
-  const [whitelist, setWhitelist] = useState(initialList);
-  const [watchPath, setWatchPath] = useState(null);
+  /** --------------------------------------
+   * 2. 控制面板開關
+   * -------------------------------------- */
+  const [showHistoryPanel, setShowHistoryPanel] = useState(false);
 
-  const inputRef = useRef(null);
-  const okAudioRef = useRef(null);
-  const ngAudioRef = useRef(null);
-
-  useEffect(() => {
-    inputRef.current?.focus();
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem("scanHistory", JSON.stringify(history));
-  }, [history]);
-
-  const normalize_code = (raw) => raw.trim();
-
-  const handle_submit = (event) => {
-    event.preventDefault();
-    const value = normalize_code(code);
-    if (!value) return;
-
-    const matched = whitelist.find((item) => item.code === value);
-    const allowed = Boolean(matched);
-
-    const scanResult = {
-      code: value,
-      allowed,
-      name: matched?.name ?? "",
-      time: new Date().toLocaleTimeString(),
-    };
-
-    setResult(scanResult);
-    setHistory((prev) => [scanResult, ...prev]);
-
-    if (allowed) {
-      okAudioRef.current?.play();
-    } else {
-      ngAudioRef.current?.play();
-    }
-
-    setCode("");
+  const toggle_history_panel = () => {
+    setShowHistoryPanel((prev) => !prev);
   };
 
-  const handle_clear_history = () => {
-    if (!window.confirm("確定要清空歷史紀錄嗎？")) return;
-    setHistory([]);
-  };
-
-  const handle_delete_one = (index) => {
-    const list = [...history];
-    list.splice(index, 1);
-    setHistory(list);
-  };
-
+  /** --------------------------------------
+   * 3. 主畫面 Layout
+   * -------------------------------------- */
   return (
-    <div className="app-root">
-      <section className="theme-section">
-        <header className="app-header">
-          <h1>白名單掃描器</h1>
-        </header>
+    <div className="app">
+      {/* 工具列 */}
+      <ToolBar
+        toggleWhitelistPanel={whitelist.toggle_whitelist_panel}
+        toggleHistoryPanel={toggle_history_panel}
+        clearWhitelist={whitelist.clear_whitelist}
+        clearHistory={history.clear_history}
+      />
 
-        <ScanInput
-          code={code}
-          setCode={setCode}
-          onSubmit={handle_submit}
-          inputRef={inputRef}
-        />
-        <ResultPanel result={result} />
+      {/* 主掃描畫面 */}
+      <ResultPanel
+        scanner={scanner}
+        whitelistReady={whitelist.isWhitelistReady}
+      />
 
-        <ToolBar
-          whitelist={whitelist}
-          history={history}
-          setWhitelist={setWhitelist}
-          setWatchPath={setWatchPath}
-        />
-      </section>
-      <section className="theme-section">
-        <header className="app-header">
-          <h1>掃描歷史紀錄</h1>
-        </header>
+      {/* 歷史紀錄面板 */}
+      {showHistoryPanel && (
         <HistoryPanel
-          history={history}
-          clearHistory={handle_clear_history}
-          deleteOne={handle_delete_one}
+          history={history.history}
+          onClear={history.clear_history}
         />
-      </section>
-      <audio ref={okAudioRef} src="/success.mp3" />
-      <audio ref={ngAudioRef} src="/fail.mp3" />
+      )}
+
+      {/* 白名單面板 */}
+      {whitelist.showWhitelistPanel && (
+        <WhitelistPanel
+          whitelist_table={whitelist.whitelist_table}
+          whitelistEntries={whitelist.whitelistEntries}
+          importedFileName={whitelist.importedFileName}
+          whitelistMessage={whitelist.whitelistMessage}
+          handle_imported={whitelist.handle_imported}
+          clearWhitelist={whitelist.clear_whitelist}
+          close_whitelist_panel={whitelist.close_whitelist_panel}
+        />
+      )}
     </div>
   );
 }
-
-export default App;

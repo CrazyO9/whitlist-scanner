@@ -1,26 +1,40 @@
+// whitelist-scanner/src/components/ExportHistory.jsx
 import React from "react";
+import { format_for_filename } from "../utils/time";
 
 export default function ExportHistory({ history }) {
-  const handleExport = () => {
-    let csv = "\uFEFF貨號,白名單,掃描時間\n";
+  const export_csv = () => {
+    if (!history || history.length === 0) return;
 
-    history.forEach((r) => {
-      csv += `${r.code},${r.allowed},${r.time}\n`;
-    });
+    const headers = ["時間", "代碼", "是否通過", "商品名稱"];
+    const rows = history.map((item) => [
+      item.timestamp,
+      item.code,
+      item.isWhitelisted ? "PASS" : "FAIL",
+      item.entry?.name ?? "",
+    ]);
 
-    const blob = new Blob([csv], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
+    const csvContent =
+      [headers, ...rows]
+        .map(row =>
+          row
+            .map((col) => `"${String(col).replace(/"/g, '""')}"`)
+            .join(",")
+        )
+        .join("\n");
 
-    a.href = url;
-    a.download = "匯出掃描紀錄.csv";
-    a.click();
-    URL.revokeObjectURL(url);
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const filename = `scan-history_${format_for_filename()}.csv`;
+
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = filename;
+    link.click();
   };
 
   return (
-    <button className="tool-button" onClick={handleExport}>
-      匯出掃描紀錄 (CSV)
+    <button className="export-history-btn" onClick={export_csv}>
+      匯出掃描紀錄
     </button>
   );
 }

@@ -1,198 +1,321 @@
-.app-root {
-  display:  flex;
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 1.5rem;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    sans-serif;
-  background: #111827;
-  color: #f9fafb;
-  min-height: 100vh;
-}
+/* ============================================================
+   Viva Magenta Full Theme — Dark Tech + Magenta Accent
+   (完整 App.css / 一次性提供)
+============================================================ */
 
-.theme-section {
-  padding-left: .5rem;
-  padding-right: .5rem;
-}
-
-.app-header h1 {
-  margin: 0 0 0.25rem;
-}
-
-.subtitle {
+/* ------------------------------------
+   全域設定（深色 + 高科技感）
+------------------------------------ */
+body {
   margin: 0;
-  color: #9ca3af;
-  font-size: 0.9rem;
+  padding: 0;
+  background: #1b1b1b;
+  font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
+  color: #e6e6e6;
 }
 
-.scan-section {
-  margin-top: 1.5rem;
-  padding: 1rem;
-  background: #1f2937;
-  border-radius: 0.75rem;
+.app {
+  padding: 20px;
+  max-width: 1100px;
+  margin: 0 auto;
 }
 
+
+/* ------------------------------------
+   Viva Magenta 色彩
+------------------------------------ */
+:root {
+  --magenta: #bb2649;          /* 主色 Viva Magenta */
+  --magenta-light: #d9365f;
+  --magenta-trans: rgba(187, 38, 73, 0.4);
+
+  --glass-bg: rgba(255, 255, 255, 0.06);
+  --glass-border: rgba(255, 255, 255, 0.15);
+
+  --success-glow: rgba(60, 255, 150, 0.45);
+  --fail-glow: rgba(255, 80, 80, 0.45);
+}
+
+
+/* ------------------------------------
+   ToolBar — Magenta 控制列
+------------------------------------ */
+.tool-bar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
+  padding: 12px;
+  border-radius: 14px;
+  backdrop-filter: blur(8px);
+}
+
+.toolbar-btn {
+  padding: 10px 18px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.1);
+  cursor: pointer;
+  font-size: 14px;
+  color: #fff;
+  transition: 0.25s ease;
+}
+
+.toolbar-btn:hover {
+  background: rgba(255,255,255,0.18);
+}
+
+.toolbar-btn.danger {
+  background: rgba(187, 38, 73, 0.15);
+  border-color: var(--magenta-light);
+}
+
+.toolbar-btn.danger:hover {
+  background: rgba(187, 38, 73, 0.28);
+}
+
+
+/* ------------------------------------
+   ResultPanel — 掃描主框
+------------------------------------ */
+.result-panel {
+  padding: 25px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  backdrop-filter: blur(5px);
+  margin-bottom: 20px;
+}
+
+.result-panel h2 {
+  margin-top: 0;
+  color: var(--magenta-light);
+  font-weight: 600;
+}
+
+
+/* ------------------------------------
+   ScanForm — 掃描輸入與按鈕
+------------------------------------ */
 .scan-form {
   display: flex;
-  gap: 0.75rem;
-  align-items: flex-end;
-  flex-wrap: wrap;
-}
-
-.scan-label {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  font-size: 0.9rem;
+  gap: 12px;
+  margin-bottom: 16px;
 }
 
 .scan-input {
-  min-width: 260px;
-  padding: 0.5rem 0.75rem;
-  border-radius: 0.5rem;
-  border: 1px solid #374151;
-  background: #111827;
-  color: #f9fafb;
+  flex: 1;
+  padding: 14px;
+  font-size: 18px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.1);
+  color: #fff;
 }
 
 .scan-input:focus {
   outline: none;
-  border-color: #f97316;
-  box-shadow: 0 0 0 1px #f97316;
+  border-color: var(--magenta-light);
+  background: rgba(255,255,255,0.16);
 }
 
-.scan-button {
-  padding: 0.6rem 1.2rem;
-  border-radius: 999px;
+.scan-btn {
+  padding: 14px 18px;
+  background: var(--magenta);
+  color: #fff;
   border: none;
+  border-radius: 12px;
   cursor: pointer;
-  font-weight: 600;
-  background: #f97316;
-  color: #111827;
+  font-size: 16px;
+  transition: 0.25s;
 }
 
-.scan-button:hover {
-  filter: brightness(1.05);
+.scan-btn:hover {
+  background: var(--magenta-light);
 }
 
-.summary {
-  margin-top: 0.75rem;
-  display: flex;
-  gap: 1.5rem;
-  font-size: 0.9rem;
-  color: #9ca3af;
+
+/* ------------------------------------
+   ScanResult — LED 掃描結果
+------------------------------------ */
+.scan-result {
+  padding: 18px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.15);
+  margin-top: 10px;
 }
 
-.result-panel {
-  margin-top: 1rem;
+.scan-result.pass {
+  background: rgba(60, 255, 150, 0.10);
+  border-color: rgba(60,255,150,0.4);
+  box-shadow: 0 0 10px var(--success-glow);
 }
 
-.result-card {
-  margin-top: 0.5rem;
-  padding: 0.75rem 1rem;
-  border-radius: 0.75rem;
+.scan-result.fail {
+  background: rgba(255, 80, 80, 0.10);
+  border-color: rgba(255,80,80,0.4);
+  box-shadow: 0 0 10px var(--fail-glow);
 }
 
-.result-ok {
-  background: #064e3b;
-  border: 1px solid #10b981;
+.scan-result.empty {
+  background: rgba(255,255,255,0.04);
+  color: #aaa;
 }
 
-.result-ng {
-  background: #7f1d1d;
-  border: 1px solid #f87171;
+.scan-code {
+  font-size: 22px;
+  font-weight: bold;
 }
 
-.result-time {
-  margin-top: 0.25rem;
-  font-size: 0.85rem;
-  color: #e5e7eb;
+.scan-status {
+  font-size: 18px;
+  margin-top: 6px;
 }
 
-.history-section {
-  margin-top: 1.5rem;
-  padding: 1rem;
-  background: #1f2937;
-  border-radius: 0.75rem;
+.scan-time {
+  margin-top: 4px;
+  font-size: 14px;
+  color: #bbb;
 }
 
-.history-header {
+
+/* ------------------------------------
+   Panel (Whitelist / History)
+------------------------------------ */
+.whitelist-panel,
+.history-panel {
+  margin-top: 20px;
+  padding: 22px;
+
+  background: rgba(25, 25, 25, 0.85);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  backdrop-filter: blur(10px);
+
+  animation: fadeIn 0.25s ease-out;
+}
+
+.panel-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 1rem;
 }
 
-.clear-button {
-  padding: 0.35rem 0.8rem;
-  border-radius: 999px;
-  border: 1px solid #4b5563;
-  background: transparent;
-  color: #e5e7eb;
+.panel-header h2 {
+  margin: 0;
+  color: var(--magenta-light);
+}
+
+.close-btn {
+  padding: 6px 12px;
+  background: rgba(187, 38, 73, 0.25);
+  border: 1px solid var(--magenta-light);
+  border-radius: 10px;
   cursor: pointer;
-  font-size: 0.8rem;
+  color: #fff;
+  transition: 0.2s;
 }
 
-.clear-button:hover {
-  background: #374151;
+.close-btn:hover {
+  background: rgba(187, 38, 73, 0.35);
 }
 
-.history-table-wrapper {
-  margin-top: 0.75rem;
-  overflow-x: auto;
+.info-msg {
+  margin-top: 12px;
+  padding: 10px;
+  border-left: 4px solid var(--magenta-light);
+  background: rgba(187, 38, 73, 0.15);
+  border-radius: 6px;
 }
 
-.history-table {
+.file-info {
+  margin-top: 10px;
+  color: #bbb;
+}
+
+
+/* ------------------------------------
+   匯入 / 匯出 按鈕（Magenta 版）
+------------------------------------ */
+.import-btn,
+.export-btn,
+.clear-btn,
+.export-history-btn {
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.18);
+  cursor: pointer;
+  color: #fff;
+  transition: 0.25s;
+}
+
+.import-btn {
+  display: inline-flex;   /* 讓它像 button，不會跑版 */
+}
+
+.import-btn:hover,
+.export-btn:hover,
+.clear-btn:hover,
+.export-history-btn:hover {
+  background: rgba(255,255,255,0.18);
+}
+
+
+/* ------------------------------------
+   Table（玻璃化 + Magenta 點綴）
+------------------------------------ */
+table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.9rem;
-}
-
-.history-table th,
-.history-table td {
-  border: 1px solid #374151;
-  padding: 0.4rem 0.5rem;
-  text-align: center;
-}
-
-.history-table th {
-  background: #111827;
-}
-
-.row-ok {
-  background: rgba(16, 185, 129, 0.08);
-}
-
-.row-ng {
-  background: rgba(248, 113, 113, 0.1);
-}
-
-.tool-section {
-  margin-top: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-.tool-button {
-  padding: 0.4rem 1rem;
-  border-radius: 8px;
-  border: 1px solid #444;
-  background: #222;
-  color: #eee;
-  cursor: pointer;
-}
-
-.delete-row-button {
-  padding: 0.2rem 0.6rem;
-  background: #b91c1c;
-  color: #fefefe;
-  border: none;
-  border-radius: 4px;
-}
-
-.import-ok {
-  color: #fefefe;
+  margin-top: 16px;
   font-size: 14px;
-  margin-top: 8px;
+}
+
+th {
+  padding: 10px;
+  background: rgba(255,255,255,0.08);
+  color: #eee;
+  border-bottom: 1px solid rgba(255,255,255,0.20);
+}
+
+td {
+  padding: 10px;
+  color: #ddd;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+tr.row-pass {
+  background: rgba(60,255,150,0.06);
+}
+
+tr.row-fail {
+  background: rgba(255,80,80,0.06);
+}
+
+.empty-msg,
+.history-empty {
+  padding: 20px;
+  text-align: center;
+  color: #aaa;
+}
+
+
+/* ------------------------------------
+   動畫
+------------------------------------ */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ------------------------------------
+   patch
+------------------------------------ */
+.panel-actions {
+  display: flex;
+  justify-content: space-around;
 }

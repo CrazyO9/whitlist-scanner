@@ -1,54 +1,41 @@
-import React, { useState } from "react";
-import { open } from "@tauri-apps/plugin-dialog";
-import { invoke } from "@tauri-apps/api/core";
+import React from "react";
+import { invoke } from "@tauri-apps/api";
 
-export default function WhitelistImport({ setWhitelist, setWatchPath }) {
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");   // 成功/錯誤訊息
-  const [error, setError] = useState("");
-
-  const handleImport = async () => {
-    setMessage("");
-    setError("");
-
-    const selected = await open({
-      title: "選擇白名單檔案",
-      filters: [{ name: "Whitelist", extensions: ["txt", "csv", "xlsx"] }],
-    });
-
-    if (!selected) return;
+export default function WhitelistImport({ handle_imported }) {
+  const handle_file = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
 
     try {
-      setLoading(true);
+      // 將 file 轉成 raw bytes，傳給 Rust
+      const arrayBuffer = await file.arrayBuffer();
+      const bytes = Array.from(new Uint8Array(arrayBuffer));
 
-      // --- 呼叫 Rust 匯入 ---
-      const items = await invoke("import_whitelist", { path: selected });
+      // 呼叫後端 Rust
+      const parsed = await invoke("parse_whitelist_file", {
+        fileName: file.name,
+        fileBytes: bytes,
+      });
 
-      setWhitelist(items);
-      setWatchPath(selected);
-
-      // --- 啟動監控 ---
-      await invoke("watch_whitelist", { path: selected });
-
-      setMessage(`✔ 匯入成功，共 ${items.length} 筆`);
-    } 
-    catch (err) {
+      // 回傳結果應為 Rust struct => 自動轉成 JS object array
+      handle_imported(parsed, file.name);
+    } catch (err) {
       console.error(err);
-      setError(`匯入失敗：${String(err)}`);
-    } 
-    finally {
-      setLoading(false);
+      alert("匯入白名單失敗，請確認檔案格式是否正確");
     }
   };
 
   return (
-    <div className="tool-section">
-      <button className="tool-button" onClick={handleImport} disabled={loading}>
-        {loading ? "匯入中…" : "匯入白名單 (Excel/CSV)"}
-      </button>
-
-      {message && <div className="import-ok">{message}</div>}
-      {error && <div style={{ color: "red", marginTop: 8 }}>{error}</div>}
+    <div className="whitelist-import">
+      <label className="import-btn">
+        匯入白名單
+        <input
+          type="file"
+          accept=".csv,.xlsx"
+          style={{ display: "none" }}
+          onChange={handle_file}
+        />
+      </label>
     </div>
   );
 }

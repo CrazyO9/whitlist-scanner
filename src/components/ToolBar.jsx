@@ -1,19 +1,40 @@
+// whitelist-scanner/src/components/ToolBar.jsx
 import React from "react";
-import WhitelistImport from "./WhitelistImport";
-import WhitelistExport from "./WhitelistExport";
-import ExportHistory from "./ExportHistory";
+import { useDoubleClickConfirm } from "../hooks/useDoubleClickConfirm";
 
 export default function ToolBar({
-  whitelist,
-  history,
-  setWhitelist,
-  setWatchPath,
+  toggleWhitelistPanel,
+  toggleHistoryPanel,
+  clearWhitelist,
+  clearHistory,
 }) {
+  const {
+    isConfirming: confirmClearWL,
+    try_action: tryClearWhitelist,
+  } = useDoubleClickConfirm({ onConfirm: clearWhitelist });
+
+  const {
+    isConfirming: confirmClearHistory,
+    try_action: tryClearHistory,
+  } = useDoubleClickConfirm({ onConfirm: clearHistory });
+
   return (
-    <div className="tool-section">
-      <WhitelistImport setWhitelist={setWhitelist} setWatchPath={setWatchPath} />
-      <WhitelistExport whitelist={whitelist} />
-      <ExportHistory history={history} />
+    <div className="tool-bar">
+      <button className="toolbar-btn" onClick={toggleWhitelistPanel}>
+        白名單管理
+      </button>
+
+      <button className="toolbar-btn" onClick={toggleHistoryPanel}>
+        掃描紀錄
+      </button>
+
+      <button className="toolbar-btn danger" onClick={tryClearWhitelist}>
+        {confirmClearWL ? "再次確認" : "清空白名單"}
+      </button>
+
+      <button className="toolbar-btn danger" onClick={tryClearHistory}>
+        {confirmClearHistory ? "再次確認" : "清空紀錄"}
+      </button>
     </div>
   );
 }

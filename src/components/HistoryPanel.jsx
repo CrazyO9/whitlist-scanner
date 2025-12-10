@@ -1,54 +1,48 @@
+// whitelist-scanner/src/components/HistoryPanel.jsx
 import React from "react";
+import ExportHistory from "./ExportHistory";
 
-export default function HistoryPanel({ history, clearHistory, deleteOne }) {
+export default function HistoryPanel({ history, onClear }) {
+
   return (
-    <section className="history-section">
-      <div className="histoty-header">
-        <button
-          type="button"
-          onClick={clearHistory}
-          className="clear-button"
-          >
-          清空紀錄
-        </button>
-      </div>
+    <div className="history-panel">
+      <h2>掃描紀錄</h2>
 
-      {history.length === 0 ? (
-        <p>目前沒有任何紀錄。</p>
-      ) : (
-        <div className="history-table-wrapper">
-          <table className="history-table">
+      <ExportHistory history={history} />
+
+      <button className="clear-history-btn" onClick={onClear}>
+        清除紀錄
+      </button>
+
+      <div className="history-table">
+        {history.length === 0 ? (
+          <div className="history-empty">尚無掃描紀錄</div>
+        ) : (
+          <table>
             <thead>
               <tr>
                 <th>時間</th>
-                <th>編號</th>
+                <th>代碼</th>
                 <th>狀態</th>
-                <th>操作</th>
+                <th>商品名稱</th>
               </tr>
             </thead>
             <tbody>
-              {history.map((row, index) => (
+              {history.map((item, idx) => (
                 <tr
-                  key={index}
-                  className={row.allowed ? "row-ok" : "row-ng"}
+                  key={idx}
+                  className={item.isWhitelisted ? "row-pass" : "row-fail"}
                 >
-                  <td>{row.time}</td>
-                  <td>{row.code}</td>
-                  <td>{row.allowed ? "是" : "否"}</td>
-                  <td>
-                    <button
-                      className="delete-row-button"
-                      onClick={() => deleteOne(index)}
-                    >
-                      刪除
-                    </button>
-                  </td>
+                  <td>{item.timestamp}</td>
+                  <td>{item.code}</td>
+                  <td>{item.isWhitelisted ? "✔" : "✖"}</td>
+                  <td>{item.entry?.name ?? ""}</td>
                 </tr>
               ))}
             </tbody>
           </table>
-        </div>
-      )}
-    </section>
+        )}
+      </div>
+    </div>
   );
 }

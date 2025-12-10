@@ -1,24 +1,33 @@
+// whitelist-scanner/src/components/WhitelistExport.jsx
 import React from "react";
-import { save } from "@tauri-apps/plugin-dialog";
-import { invoke } from "@tauri-apps/api/core";
+import { format_for_filename } from "../utils/time";
 
-export default function WhitelistExport({ whitelist }) {
-  const handleExport = async () => {
-    const path = await save({
-      title: "匯出白名單 CSV",
-      filters: [{ name: "CSV", extensions: ["csv"] }],
+export default function WhitelistExport({ whitelistEntries }) {
+  const export_csv = () => {
+    if (!whitelistEntries || whitelistEntries.length === 0) return;
+
+    const headers = Object.keys(whitelistEntries[0]);
+    const rows = whitelistEntries.map((entry) =>
+      headers.map((h) => `"${String(entry[h] ?? "").replace(/"/g, '""')}"`)
+    );
+
+    const csvContent =
+      [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
+
+    const blob = new Blob([csvContent], {
+      type: "text/csv;charset=utf-8;",
     });
 
-    if (!path) return;
+    const filename = `whitelist_${format_for_filename()}.csv`;
 
-    await invoke("export_whitelist", {
-      path,
-      items: whitelist,
-    });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = filename;
+    link.click();
   };
 
   return (
-    <button className="tool-button" onClick={handleExport}>
+    <button className="export-btn" onClick={export_csv}>
       匯出白名單
     </button>
   );
