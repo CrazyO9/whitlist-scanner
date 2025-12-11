@@ -1,41 +1,45 @@
 import React from "react";
-import { invoke } from "@tauri-apps/api";
+import { invoke } from "@tauri-apps/api/core";
+import { open } from "@tauri-apps/plugin-dialog";
 
 export default function WhitelistImport({ handle_imported }) {
-  const handle_file = async (event) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
+  const handle_open_file = async () => {
     try {
-      // 將 file 轉成 raw bytes，傳給 Rust
-      const arrayBuffer = await file.arrayBuffer();
-      const bytes = Array.from(new Uint8Array(arrayBuffer));
-
-      // 呼叫後端 Rust
-      const parsed = await invoke("parse_whitelist_file", {
-        fileName: file.name,
-        fileBytes: bytes,
+      // 打開 Tauri 檔案對話框
+      const selected = await open({
+        multiple: false,
+        filters: [
+          {
+            name: "EXCEL",
+            extensions: ["csv", "xlsx"],
+          },
+        ],
       });
 
-      // 回傳結果應為 Rust struct => 自動轉成 JS object array
-      handle_imported(parsed, file.name);
+      if (!selected) {
+        console.log("取消選擇");
+        return;
+      }
+
+      // selected 就是路徑（String）
+      const path = selected;
+
+      // 呼叫後端 Rust，依據副檔名自動解析
+      const parsed = await invoke("import_whitelist", { path });
+
+      // 回傳 WhiteTable 給 React useWhitelist
+      handle_imported(parsed, path);
     } catch (err) {
-      console.error(err);
-      alert("匯入白名單失敗，請確認檔案格式是否正確");
+      console.error("匯入白名單失敗:", err);
+      alert("匯入白名單失敗，請確認檔案是否有效。");
     }
   };
 
   return (
     <div className="whitelist-import">
-      <label className="import-btn">
+      <button className="import-btn" onClick={handle_open_file}>
         匯入白名單
-        <input
-          type="file"
-          accept=".csv,.xlsx"
-          style={{ display: "none" }}
-          onChange={handle_file}
-        />
-      </label>
+      </button>
     </div>
   );
 }
