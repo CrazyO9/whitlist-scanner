@@ -4,11 +4,12 @@ import { normalize_code } from "../utils/normalize";
 import { format_timestamp } from "../utils/time";
 
 /**
- * 需要由外部傳入：
- * - findByCode: (code: string) => whitelistEntry | null
- * - onScanned: (scanRecord) => void   // 給 history 用（可選）
+ * 需要外部提供：
+ * - findByCode: (code) => entry | null
+ * - isWhitelistReady: boolean
+ * - onScanned: (record) => void
  */
-export function useScanner({ findByCode, onScanned } = {}) {
+export function useScanner({ findByCode, isWhitelistReady, onScanned } = {}) {
   const [inputCode, setInputCode] = useState("");
   const [lastScanResult, setLastScanResult] = useState(null);
   const [scanMessage, setScanMessage] = useState("");
@@ -29,11 +30,6 @@ export function useScanner({ findByCode, onScanned } = {}) {
         return;
       }
 
-      if (!findByCode) {
-        setScanMessage("白名單尚未準備好");
-        return;
-      }
-
       const found = findByCode(code);
       const isWhitelisted = !!found;
       const timestamp = format_timestamp();
@@ -46,16 +42,12 @@ export function useScanner({ findByCode, onScanned } = {}) {
       };
 
       setLastScanResult(record);
-      setScanMessage(isWhitelisted ? "允許通過" : "不在白名單");
 
-      if (typeof onScanned === "function") {
-        onScanned(record);
-      }
+      if (typeof onScanned === "function") onScanned(record);
 
-      // 掃完清輸入框（可依需求改）
-      setInputCode("");
+      setInputCode(""); // 清空輸入
     },
-    [findByCode, inputCode, onScanned]
+    [findByCode, isWhitelistReady, inputCode, onScanned]
   );
 
   return {

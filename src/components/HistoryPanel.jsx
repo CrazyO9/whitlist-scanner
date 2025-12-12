@@ -21,10 +21,10 @@ export default function HistoryPanel({ history, onClear }) {
           <table>
             <thead>
               <tr>
-                <th>時間</th>
-                <th>代碼</th>
+                <th>貨號</th>
                 <th>狀態</th>
-                <th>商品名稱</th>
+                <th>時間</th>
+                {/* <th>商品名稱</th> */}
               </tr>
             </thead>
             <tbody>
@@ -33,10 +33,10 @@ export default function HistoryPanel({ history, onClear }) {
                   key={idx}
                   className={item.isWhitelisted ? "row-pass" : "row-fail"}
                 >
-                  <td>{item.timestamp}</td>
                   <td>{item.code}</td>
                   <td>{item.isWhitelisted ? "✔" : "✖"}</td>
-                  <td>{item.entry?.name ?? ""}</td>
+                  <td>{item.timestamp}</td>
+                  {/* <td>{item.entry?.name ?? ""}</td> */}
                 </tr>
               ))}
             </tbody>

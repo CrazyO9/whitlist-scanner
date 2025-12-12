@@ -13,8 +13,10 @@ pub struct WhiteItem {
 /// 代表「一份完整白名單」
 /// file_name: 上傳檔名字串（不含副檔名或含都可以，但要一致）
 /// columns:  {"HEADER A": ["row1", "row2", ...], "HEADER B": [...]} 這種結構
+/// header_order: 保留原始檔的欄位順序
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct WhiteTable {
     pub file_name: String,
     pub columns: HashMap<String, Vec<String>>,
+    pub header_order: Vec<String>
 }

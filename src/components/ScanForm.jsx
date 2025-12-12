@@ -5,7 +5,7 @@ export default function ScanForm({
   inputCode,
   onInputChange,
   onScan,
-  disabled = false,
+  whitelistReady = false,
 }) {
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
@@ -21,15 +21,15 @@ export default function ScanForm({
         value={inputCode}
         onChange={onInputChange}
         onKeyDown={handleKeyDown}
-        disabled={disabled}
-        placeholder="請輸入條碼或代碼…"
+        disabled={whitelistReady}
+        placeholder={!whitelistReady ? "請掃描條碼…" : "尚未匯入白名單"}
         className="scan-input"
       />
 
       <button
         className="scan-btn"
         onClick={onScan}
-        disabled={disabled}
+        disabled={whitelistReady}
       >
         掃描
       </button>

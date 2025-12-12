@@ -19,17 +19,11 @@ export default function ResultPanel({
     <div className="result-panel">
       <h2>掃描器</h2>
 
-      {!whitelistReady && (
-        <div className="warning">
-          尚未匯入白名單，無法掃描。
-        </div>
-      )}
-
       <ScanForm
         inputCode={inputCode}
         onInputChange={handle_input_change}
         onScan={do_scan}
-        disabled={!whitelistReady}
+        whitelistReady={!whitelistReady}
       />
 
       {scanMessage && (

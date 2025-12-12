@@ -44,6 +44,8 @@ fn import_csv(path: &str, file_name: String) -> Result<WhiteTable, String> {
         .map(|h| h.to_string())
         .collect::<Vec<_>>();
 
+    let header_order = headers.clone();
+
     let mut columns: HashMap<String, Vec<String>> =
         headers.iter().map(|h| (h.clone(), vec![])).collect();
 
@@ -57,7 +59,7 @@ fn import_csv(path: &str, file_name: String) -> Result<WhiteTable, String> {
         }
     }
 
-    Ok(WhiteTable { file_name, columns })
+    Ok(WhiteTable { file_name, columns, header_order })
 }
 
 //////////////////////////////////////////////
@@ -91,6 +93,8 @@ fn import_xlsx(path: &str, file_name: String) -> Result<WhiteTable, String> {
         })
         .collect();
 
+    let header_order = headers.clone();
+
     // ---- 建立 HashMap 用於存每一欄 ----
     let mut columns: HashMap<String, Vec<String>> =
         headers.iter().map(|h| (h.clone(), vec![])).collect();
@@ -107,5 +111,5 @@ fn import_xlsx(path: &str, file_name: String) -> Result<WhiteTable, String> {
         }
     }
 
-    Ok(WhiteTable { file_name, columns })
+    Ok(WhiteTable { file_name, columns, header_order })
 }

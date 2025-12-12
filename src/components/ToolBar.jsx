@@ -33,7 +33,7 @@ export default function ToolBar({
       </button>
 
       <button className="toolbar-btn danger" onClick={tryClearHistory}>
-        {confirmClearHistory ? "再次確認" : "清空紀錄"}
+        {confirmClearHistory ? "再次確認" : "清空歷史"}
       </button>
     </div>
   );

@@ -13,18 +13,19 @@ import WhitelistPanel from "./components/WhitelistPanel";
 
 export default function App() {
   /** --------------------------------------
-   * 1. 初始化 Hook (資料邏輯)
+   * 1. 初始化 Hooks（資料邏輯）
    * -------------------------------------- */
   const whitelist = useWhitelist();
   const history = useScanHistory();
 
+  // 掃描器：改查詢至 whitelist.find_by_code（entries 已自動轉換）
   const scanner = useScanner({
     findByCode: whitelist.find_by_code,
     onScanned: history.add_record,
   });
 
   /** --------------------------------------
-   * 2. 控制面板開關
+   * 2. 歷史面板開關
    * -------------------------------------- */
   const [showHistoryPanel, setShowHistoryPanel] = useState(false);
 
@@ -53,18 +54,13 @@ export default function App() {
 
       {/* 歷史紀錄面板 */}
       {showHistoryPanel && (
-        <HistoryPanel
-          history={history.history}
-          onClear={history.clear_history}
-        />
+        <HistoryPanel history={history.history} onClear={history.clear_history} />
       )}
 
       {/* 白名單面板 */}
       {whitelist.showWhitelistPanel && (
         <WhitelistPanel
-          whitelist_table={whitelist.whitelist_table}
-          whitelistEntries={whitelist.whitelistEntries}
-          importedFileName={whitelist.importedFileName}
+          whiteTable={whitelist.whiteTable}            // ✔ 改為 WhiteTable
           whitelistMessage={whitelist.whitelistMessage}
           handle_imported={whitelist.handle_imported}
           clearWhitelist={whitelist.clear_whitelist}

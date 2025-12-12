@@ -1,7 +1,7 @@
 // src/whitelist/storage.rs
 use crate::whitelist::model::WhiteTable;
 use serde_json;
-use std::collections::HashMap;
+// use std::collections::HashMap;
 use std::fs;
 use std::path::{Path, PathBuf};
 use tauri::AppHandle;
@@ -28,11 +28,8 @@ fn upload_file_path(_app: &AppHandle, file_name: &str) -> Result<PathBuf, String
 pub async fn save_whitelist(app: AppHandle, table: WhiteTable) -> Result<(), String> {
     let path = upload_file_path(&app, &table.file_name)?;
 
-    // 組成你要的 JSON 結構：{ "<file_name>": { header: [values...] } }
-    let mut root: HashMap<String, HashMap<String, Vec<String>>> = HashMap::new();
-    root.insert(table.file_name.clone(), table.columns.clone());
+    let json = serde_json::to_string_pretty(&table).map_err(|e| e.to_string())?;
 
-    let json = serde_json::to_string_pretty(&root).map_err(|e| e.to_string())?;
     fs::write(&path, json).map_err(|e| e.to_string())
 }
 
@@ -46,13 +43,9 @@ pub async fn load_whitelist(app: AppHandle, file_name: String) -> Result<WhiteTa
     }
 
     let content = fs::read_to_string(&path).map_err(|e| e.to_string())?;
-    let root: HashMap<String, HashMap<String, Vec<String>>> =
-        serde_json::from_str(&content).map_err(|e| e.to_string())?;
 
-    let columns = root
-        .get(&file_name)
-        .cloned()
-        .ok_or_else(|| "JSON 裡找不到對應檔名的資料".to_string())?;
+    // 直接還原完整 WhiteTable
+    let table: WhiteTable = serde_json::from_str(&content).map_err(|e| e.to_string())?;
 
-    Ok(WhiteTable { file_name, columns })
+    Ok(table)
 }
