@@ -10,7 +10,7 @@ export default function HistoryPanel({ history, onClear }) {
 
       <ExportHistory history={history} />
 
-      <button className="clear-history-btn" onClick={onClear}>
+      <button className="clear-btn danger" onClick={onClear}>
         清除紀錄
       </button>
 

@@ -1,34 +1,58 @@
 // whitelist-scanner/src/components/WhitelistExport.jsx
-import React from "react";
-import { format_for_filename } from "../utils/time";
+import React, { useState, useEffect } from "react";
+import { invoke } from "@tauri-apps/api/core";
 
-export default function WhitelistExport({ whitelistEntries }) {
-  const export_csv = () => {
-    if (!whitelistEntries || whitelistEntries.length === 0) return;
+export default function WhitelistExport({ whiteTable, resetKey }) {
+  const [status, setStatus] = useState("idle"); // idle | exporting | done
+  const [exportPath, setExportPath] = useState("");
 
-    const headers = Object.keys(whitelistEntries[0]);
-    const rows = whitelistEntries.map((entry) =>
-      headers.map((h) => `"${String(entry[h] ?? "").replace(/"/g, '""')}"`)
-    );
+  // ⭐ 只要 resetKey 變，就回到初始狀態
+  useEffect(() => {
+    setStatus("idle");
+    setExportPath("");
+  }, [resetKey]);
 
-    const csvContent =
-      [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
+  const export_whitelist = async () => {
+    if (!whiteTable || status === "exporting") return;
 
-    const blob = new Blob([csvContent], {
-      type: "text/csv;charset=utf-8;",
-    });
+    try {
+      setStatus("exporting");
+      setExportPath("");
 
-    const filename = `whitelist_${format_for_filename()}.csv`;
+      const path = await invoke("export_whitelist", {
+        table: whiteTable,
+      });
 
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = filename;
-    link.click();
+      setExportPath(path);
+      setStatus("done");
+
+    } catch (err) {
+      console.error(err);
+      alert("匯出白名單失敗");
+      setStatus("idle");
+    }
+  };
+  
+  const handle_click = () => {
+    if (status === "idle") {
+      export_whitelist();
+    } else if (status === "done") {
+      open(exportPath);
+    };
   };
 
   return (
-    <button className="export-btn" onClick={export_csv}>
-      匯出白名單
-    </button>
+    <div className="export-wrapper">
+        <button
+          className={`export-btn ${status}`}
+          onClick={handle_click}
+          disabled={status === "exporting"}
+        >
+        {status === "idle" && "匯出白名單"}
+        {status === "exporting" && "匯出中…"}
+        {status === "done" && "📂 開啟資料夾"}
+        <span className="export-progress" />
+      </button>
+    </div>
   );
 }

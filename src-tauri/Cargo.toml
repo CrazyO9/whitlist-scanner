@@ -11,6 +11,7 @@ tauri-plugin-dialog = "2"
 tauri-plugin-shell = "2"
 csv = "1"
 calamine = "0.24"
+chrono = "0.4"
 
 [build-dependencies]
 tauri-build = { version = "2", features = [] }

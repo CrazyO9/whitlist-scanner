@@ -17,10 +17,9 @@ export default function WhitelistImport({ handle_imported }) {
       });
 
       if (!selected) {
-        console.log("取消選擇");
         return;
       }
-
+      
       // selected 就是路徑（String）
       const path = selected;
 

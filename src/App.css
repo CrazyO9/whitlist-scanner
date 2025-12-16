@@ -14,13 +14,6 @@ body {
   color: #e6e6e6;
 }
 
-.app {
-  padding: 20px;
-  max-width: 1100px;
-  margin: 0 auto;
-}
-
-
 /* ------------------------------------
    Viva Magenta 色彩
 ------------------------------------ */
@@ -36,6 +29,29 @@ body {
   --fail-glow: rgba(255, 80, 80, 0.45);
 }
 
+/* ------------------------------------
+   App.jsx
+------------------------------------ */
+.app-layout {
+  display: grid;
+  grid-template-columns: 2fr 1fr; /* 左大右小，可自行調 */
+  height: 100vh;
+  gap: 12px;
+  padding: 12px;
+  box-sizing: border-box;
+}
+
+/* 左右欄都可各自捲動 */
+.left-panel,
+.right-panel {
+  overflow: auto;
+}
+
+/* 右欄視覺上像資訊面板 */
+.right-panel {
+  border-left: 1px solid #ddd;
+  padding-left: 12px;
+}
 
 /* ------------------------------------
    ToolBar — Magenta 控制列
@@ -67,11 +83,6 @@ body {
   background: rgba(255,255,255,0.18);
 }
 
-.toolbar-btn.danger {
-  background: rgba(187, 38, 73, 0.15);
-  border-color: var(--magenta-light);
-}
-
 .toolbar-btn.danger:hover {
   background: rgba(187, 38, 73, 0.28);
 }
@@ -81,6 +92,9 @@ body {
    ResultPanel — 掃描主框
 ------------------------------------ */
 .result-panel {
+  position: sticky;
+  top: 12px;
+  z-index: 5;
   padding: 25px;
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
@@ -199,13 +213,12 @@ body {
 
 .panel-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
   margin-bottom: 1rem;
 }
 
 .panel-header h2 {
-  margin: 0;
+  margin: 0 1rem 0 0;
   color: var(--magenta-light);
 }
 
@@ -224,7 +237,7 @@ body {
 }
 
 .info-msg {
-  margin-top: 12px;
+  flex: 1;
   padding: 10px;
   border-left: 4px solid var(--magenta-light);
   background: rgba(187, 38, 73, 0.15);
@@ -244,6 +257,7 @@ body {
 .export-btn,
 .clear-btn,
 .export-history-btn {
+  
   padding: 10px 14px;
   border-radius: 10px;
   background: rgba(255,255,255,0.1);
@@ -264,6 +278,10 @@ body {
   background: rgba(255,255,255,0.18);
 }
 
+.clear-btn.danger {
+  background: rgba(187, 38, 73, 0.15);
+  border-color: var(--magenta-light);
+}
 
 /* ------------------------------------
    Table（玻璃化 + Magenta 點綴）
@@ -318,4 +336,60 @@ tr.row-fail {
 .panel-actions {
   display: flex;
   justify-content: space-around;
+}
+
+.export-wrapper {
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* 進度框（沿著邊框跑） */
+.export-progress {
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  pointer-events: none;
+  box-sizing: border-box;
+  border: 3px solid transparent;
+
+  clip-path: polygon(
+    0% 0%, 12.5% 0%, 12.5% 100%, 0% 100%,
+    0% 0%, 100% 0%, 100% 12.5%, 0% 12.5%,
+    87.5% 0%, 100% 0%, 100% 100%, 87.5% 100%,
+    0% 87.5%, 100% 87.5%, 100% 100%, 0% 100%
+  );
+}
+
+/* 匯出中：邊框填滿動畫 */
+.export-btn.exporting .export-progress {
+  border-color: var(--magenta-light);
+  animation: border-fill 1.2s linear infinite;
+}
+
+/* 完成：固定滿框 */
+.export-btn.done .export-progress {
+  border-color: var(--magenta-light);
+}
+
+/* 動畫：邊框逐段亮起（視覺填滿感） */
+@keyframes border-8-steps {
+  from {
+    stroke-dashoffset: 100%;
+  }
+  to {
+    stroke-dashoffset: 0%;
+  }
+}
+
+/* 匯出路徑提示 */
+.export-path {
+  font-size: 12px;
+  color: #ccc;
+  word-break: break-all;
+}
+
+.export-path code {
+  color: #9cdcfe;
 }

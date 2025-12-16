@@ -2,9 +2,14 @@
 mod window;
 pub mod whitelist;
 
-use whitelist::import::import_whitelist;
-use whitelist::export::export_whitelist;
-use whitelist::storage::{save_whitelist, load_whitelist};
+use whitelist::{
+    import_whitelist,
+    export_whitelist,
+    export_scan_history,
+    save_whitelist, 
+    load_whitelist,
+    reveal_in_folder
+};
 // use tauri::Manager;
 
 fn main() {
@@ -13,8 +18,10 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             import_whitelist,
             export_whitelist,
+            export_scan_history,
             save_whitelist,
-            load_whitelist
+            load_whitelist,
+            reveal_in_folder
         ])
         // Tauri v2 plugin 初始化（你現在用到的）
         .plugin(tauri_plugin_dialog::init())

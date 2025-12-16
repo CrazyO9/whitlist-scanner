@@ -1,35 +1,29 @@
 // whitelist-scanner/src/components/ExportHistory.jsx
 import React from "react";
-import { format_for_filename } from "../utils/time";
+import { invoke } from "@tauri-apps/api/core";
 
 export default function ExportHistory({ history }) {
-  const export_csv = () => {
+  const export_csv = async () => {
     if (!history || history.length === 0) return;
 
-    const headers = ["時間", "代碼", "是否通過", "商品名稱"];
-    const rows = history.map((item) => [
-      item.timestamp,
-      item.code,
-      item.isWhitelisted ? "PASS" : "FAIL",
-      item.entry?.name ?? "",
-    ]);
+    // 將前端紀錄轉成後端需要的結構
+    const payload = history.map((item) => ({
+      timestamp: item.timestamp,
+      code: item.code,
+      is_whitelisted: item.isWhitelisted,
+      name: item.entry?.name ?? null,
+    }));
 
-    const csvContent =
-      [headers, ...rows]
-        .map(row =>
-          row
-            .map((col) => `"${String(col).replace(/"/g, '""')}"`)
-            .join(",")
-        )
-        .join("\n");
+    try {
+      const filename = await invoke("export_scan_history", {
+        history: payload,
+      });
 
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const filename = `scan-history_${format_for_filename()}.csv`;
-
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = filename;
-    link.click();
+      alert(`掃描紀錄已匯出：${filename}`);
+    } catch (err) {
+      console.error(err);
+      alert("匯出掃描紀錄失敗");
+    }
   };
 
   return (
