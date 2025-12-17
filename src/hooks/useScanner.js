@@ -22,9 +22,21 @@ export function useScanner({ findByCode, isWhitelistReady, onScanned } = {}) {
     setInputCode("");
   }, []);
 
+  const set_input_code = useCallback((value) => {
+    if (typeof value !== "string") return;
+    setInputCode(value);
+  }, []);
+
   const do_scan = useCallback(
     (rawCode) => {
-      const code = normalize_code(rawCode ?? inputCode);
+      // 避免 event / object 被誤傳
+      const safeRaw =
+        typeof rawCode === "string"
+          ? rawCode
+          : typeof rawCode?.target?.value === "string"
+          ? rawCode.target.value
+          : "";
+      const code = normalize_code(safeRaw ?? inputCode);
       if (!code) {
         setScanMessage("請先輸入條碼 / 代碼");
         return;
@@ -56,6 +68,7 @@ export function useScanner({ findByCode, isWhitelistReady, onScanned } = {}) {
     scanMessage,
 
     handle_input_change,
+    set_input_code,
     clear_input,
     do_scan,
   };

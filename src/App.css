@@ -213,6 +213,7 @@ body {
 
 .panel-header {
   display: flex;
+  justify-content: space-between;
   align-items: center;
   margin-bottom: 1rem;
 }
@@ -237,27 +238,22 @@ body {
 }
 
 .info-msg {
-  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
   padding: 10px;
   border-left: 4px solid var(--magenta-light);
   background: rgba(187, 38, 73, 0.15);
   border-radius: 6px;
 }
 
-.file-info {
-  margin-top: 10px;
-  color: #bbb;
-}
-
-
 /* ------------------------------------
    匯入 / 匯出 按鈕（Magenta 版）
 ------------------------------------ */
 .import-btn,
-.export-btn,
 .clear-btn,
 .export-history-btn {
-  
+  position: relative;
   padding: 10px 14px;
   border-radius: 10px;
   background: rgba(255,255,255,0.1);
@@ -272,7 +268,6 @@ body {
 }
 
 .import-btn:hover,
-.export-btn:hover,
 .clear-btn:hover,
 .export-history-btn:hover {
   background: rgba(255,255,255,0.18);
@@ -335,6 +330,7 @@ tr.row-fail {
 ------------------------------------ */
 .panel-actions {
   display: flex;
+  flex: 1;
   justify-content: space-around;
 }
 
@@ -346,10 +342,11 @@ tr.row-fail {
 }
 
 /* 進度框（沿著邊框跑） */
-.export-progress {
+.export-wrapper::before {
+  content: "";
   position: absolute;
   inset: 0;
-  border-radius: 14px;
+  border-radius: 18px;
   pointer-events: none;
   box-sizing: border-box;
   border: 3px solid transparent;
@@ -360,18 +357,22 @@ tr.row-fail {
     87.5% 0%, 100% 0%, 100% 100%, 87.5% 100%,
     0% 87.5%, 100% 87.5%, 100% 100%, 0% 100%
   );
+
+  opacity: 0;
 }
 
-/* 匯出中：邊框填滿動畫 */
-.export-btn.exporting .export-progress {
+.export-wrapper.exporting::before {
+  opacity: 1;
   border-color: var(--magenta-light);
   animation: border-fill 1.2s linear infinite;
 }
 
-/* 完成：固定滿框 */
-.export-btn.done .export-progress {
+.export-wrapper.done::before {
+  opacity: 1;
   border-color: var(--magenta-light);
+  animation: none;
 }
+
 
 /* 動畫：邊框逐段亮起（視覺填滿感） */
 @keyframes border-8-steps {

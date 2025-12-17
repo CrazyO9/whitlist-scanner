@@ -37,7 +37,7 @@ export default function WhitelistImport({ handle_imported }) {
   return (
     <div className="whitelist-import">
       <button className="import-btn" onClick={handle_open_file}>
-        匯入白名單
+        匯入
       </button>
     </div>
   );

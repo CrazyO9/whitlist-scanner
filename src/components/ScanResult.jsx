@@ -20,11 +20,6 @@ export default function ScanResult({ result }) {
 
       <div className="scan-time">{timestamp}</div>
 
-      {/* {isWhitelisted && (
-        <div className="scan-entry">
-          <div>商品名稱：{entry?.name}</div>
-        </div>
-      )} */}
     </div>
   );
 }

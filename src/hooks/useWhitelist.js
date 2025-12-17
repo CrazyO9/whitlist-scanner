@@ -107,7 +107,7 @@ export function useWhitelist() {
       setWhitelistMap(map);
 
       setImportedFileName(pathName || whiteTableData.file_name || "");
-      setWhitelistMessage(`已匯入 ${cleanEntries.length} 筆白名單資料`);
+      setWhitelistMessage(`(${cleanEntries.length}筆)`);
       setIsWhitelistReady(map.size > 0);
 
     },
