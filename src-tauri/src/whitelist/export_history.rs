@@ -32,7 +32,7 @@ pub async fn export_scan_history(
     }
 
     let filename = format!(
-        "scan-history_{}.csv",
+        "scanHistory_{}.csv",
         chrono::Local::now().format("%Y%m%d_%H%M%S")
     );
 
@@ -54,5 +54,5 @@ pub async fn export_scan_history(
 
     fs::write(&path, csv).map_err(|e| e.to_string())?;
 
-    Ok(filename)
+    Ok(path.to_string_lossy().to_string())
 }

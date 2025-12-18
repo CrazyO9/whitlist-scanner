@@ -251,8 +251,7 @@ body {
    匯入 / 匯出 按鈕（Magenta 版）
 ------------------------------------ */
 .import-btn,
-.clear-btn,
-.export-history-btn {
+.clear-btn {
   position: relative;
   padding: 10px 14px;
   border-radius: 10px;
@@ -309,7 +308,6 @@ tr.row-fail {
   background: rgba(255,80,80,0.06);
 }
 
-.empty-msg,
 .history-empty {
   padding: 20px;
   text-align: center;
@@ -332,65 +330,4 @@ tr.row-fail {
   display: flex;
   flex: 1;
   justify-content: space-around;
-}
-
-.export-wrapper {
-  display: flex;
-  position: relative;
-  flex-direction: column;
-  gap: 8px;
-}
-
-/* 進度框（沿著邊框跑） */
-.export-wrapper::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 18px;
-  pointer-events: none;
-  box-sizing: border-box;
-  border: 3px solid transparent;
-
-  clip-path: polygon(
-    0% 0%, 12.5% 0%, 12.5% 100%, 0% 100%,
-    0% 0%, 100% 0%, 100% 12.5%, 0% 12.5%,
-    87.5% 0%, 100% 0%, 100% 100%, 87.5% 100%,
-    0% 87.5%, 100% 87.5%, 100% 100%, 0% 100%
-  );
-
-  opacity: 0;
-}
-
-.export-wrapper.exporting::before {
-  opacity: 1;
-  border-color: var(--magenta-light);
-  animation: border-fill 1.2s linear infinite;
-}
-
-.export-wrapper.done::before {
-  opacity: 1;
-  border-color: var(--magenta-light);
-  animation: none;
-}
-
-
-/* 動畫：邊框逐段亮起（視覺填滿感） */
-@keyframes border-8-steps {
-  from {
-    stroke-dashoffset: 100%;
-  }
-  to {
-    stroke-dashoffset: 0%;
-  }
-}
-
-/* 匯出路徑提示 */
-.export-path {
-  font-size: 12px;
-  color: #ccc;
-  word-break: break-all;
-}
-
-.export-path code {
-  color: #9cdcfe;
 }

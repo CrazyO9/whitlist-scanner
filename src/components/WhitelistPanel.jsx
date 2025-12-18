@@ -76,7 +76,7 @@ export default function WhitelistPanel({
             resetKey={resetKey}
           />
           <button className="clear-btn danger" onClick={try_action}>
-            {isConfirming ? "再次確認" : "清空"}
+            {isConfirming ? "確認" : "清空"}
           </button>
         </div>
       </div>

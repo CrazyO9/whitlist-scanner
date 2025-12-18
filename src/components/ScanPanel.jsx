@@ -3,7 +3,7 @@ import React from "react";
 import ScanForm from "./ScanForm";
 import ScanResult from "./ScanResult";
 
-export default function ResultPanel({
+export default function ScanPanel({
   scanner,          // useScanner 回傳物件
   whitelistReady,   // 來自 useWhitelist.isWhitelistReady
 }) {
@@ -11,6 +11,7 @@ export default function ResultPanel({
     inputCode,
     lastScanResult,
     scanMessage,
+    set_input_code,
     handle_input_change,
     do_scan,
   } = scanner;
@@ -22,6 +23,7 @@ export default function ResultPanel({
       <ScanForm
         inputCode={inputCode}
         onInputChange={handle_input_change}
+        onInputSet={set_input_code}
         onScan={do_scan}
         whitelistReady={!whitelistReady}
       />

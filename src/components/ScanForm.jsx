@@ -1,5 +1,3 @@
-// whitelist-scanner/src/components/ScanForm.jsx
-
 export default function ScanForm({
   inputCode,
   onInputChange,
@@ -13,12 +11,14 @@ export default function ScanForm({
       onScan(inputCode);
     }
   };
+
   const handlePaste = (e) => {
     e.preventDefault();
     const pastedText = e.clipboardData.getData("text");
-      onInputSet(pastedText);
-      onScan(pastedText);
-  }
+    onInputSet(pastedText);
+    onScan(pastedText);
+  };
+
   return (
     <div className="scan-form">
       <input
@@ -34,7 +34,7 @@ export default function ScanForm({
 
       <button
         className="scan-btn"
-        onClick={onScan(inputCode)}
+        onClick={() => onScan(inputCode)}
         disabled={whitelistReady}
       >
         掃描

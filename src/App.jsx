@@ -5,7 +5,7 @@ import { useWhitelist } from "./hooks/useWhitelist";
 import { useScanHistory } from "./hooks/useScanHistory";
 import { useScanner } from "./hooks/useScanner";
 
-import ResultPanel from "./components/ResultPanel";
+import ScanPanel from "./components/ScanPanel";
 import HistoryPanel from "./components/HistoryPanel";
 import WhitelistPanel from "./components/WhitelistPanel";
 
@@ -29,7 +29,7 @@ export default function App() {
     <div className="app-layout">
       <div className="left-panel">
         {/* 主掃描畫面 */}
-        <ResultPanel
+        <ScanPanel
           scanner={scanner}
           whitelistReady={whitelist.isWhitelistReady}
         />

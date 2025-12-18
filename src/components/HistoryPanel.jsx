@@ -1,8 +1,28 @@
 // whitelist-scanner/src/components/HistoryPanel.jsx
-import React from "react";
+import { useState } from "react";
 import ExportHistory from "./ExportHistory";
+import { useDoubleClickConfirm } from "../hooks/useDoubleClickConfirm";
 
 export default function HistoryPanel({ history, onClear }) {
+  const { isConfirming, try_action } = useDoubleClickConfirm({
+    onConfirm: () => {
+      onClear();
+      setResetKey((k) => k + 1);
+    },
+  });
+
+  const [resetKey, setResetKey] = useState(0);
+  // 新增掃描紀錄
+  const handleScanned = (record) => {
+    setHistory((prev) => [...prev, record]);
+    setHistoryResetKey((k) => k + 1); // 🔁 reset export
+  };
+
+  // 刪除掃描紀錄
+  const clearHistory = () => {
+    setHistory([]);
+    setHistoryResetKey((k) => k + 1); // 🔁 reset export
+  };
 
   return (
     <div className="history-panel">
@@ -10,8 +30,8 @@ export default function HistoryPanel({ history, onClear }) {
 
       <ExportHistory history={history} />
 
-      <button className="clear-btn danger" onClick={onClear}>
-        清除紀錄
+      <button className="clear-btn danger" onClick={try_action}>
+        {isConfirming ? "確認" : "清空"}
       </button>
 
       <div className="history-table">
@@ -23,7 +43,7 @@ export default function HistoryPanel({ history, onClear }) {
               <tr>
                 <th>貨號</th>
                 <th>狀態</th>
-                <th>時間</th>
+                <th>掃描時間</th>
                 {/* <th>商品名稱</th> */}
               </tr>
             </thead>

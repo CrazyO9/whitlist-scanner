@@ -1,9 +1,11 @@
 // whitelist-scanner/src/components/ExportHistory.jsx
-import React from "react";
+import { useCallback } from "react";
 import { invoke } from "@tauri-apps/api/core";
+import ExportActionButton from "./ExportActionButton";
+import { useExportAction } from "../hooks/useExportAction";
 
-export default function ExportHistory({ history }) {
-  const export_csv = async () => {
+export default function ExportHistory({ history, resetKey }) {
+  const exportFn = useCallback(async () => {
     if (!history || history.length === 0) return;
 
     // 將前端紀錄轉成後端需要的結構
@@ -15,20 +17,38 @@ export default function ExportHistory({ history }) {
     }));
 
     try {
-      const filename = await invoke("export_scan_history", {
+
+      const exportPath = await invoke("export_scan_history", {
         history: payload,
       });
 
-      alert(`掃描紀錄已匯出：${filename}`);
+      await invoke("reveal_in_folder", {
+        path: exportPath,
+      });
+
     } catch (err) {
       console.error(err);
       alert("匯出掃描紀錄失敗");
     }
-  };
+  }, [history]);
+  
+  const {
+    status,
+    successPulseKey,
+    handleClick,
+    isExporting,
+  } = useExportAction({
+    exportFn,
+    resetKey,
+  });
 
   return (
-    <button className="export-history-btn" onClick={export_csv}>
-      匯出掃描紀錄
-    </button>
+    <ExportActionButton
+      onClick={handleClick}
+      status={status}
+      disabled={isExporting}
+      successPulseKey={successPulseKey}
+      title="匯出"
+    />
   );
 }

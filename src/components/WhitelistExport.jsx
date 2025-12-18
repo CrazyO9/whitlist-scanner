@@ -1,10 +1,11 @@
-import React from "react";
+// whitelist-scanner\src\components\WhitelistExport.jsx
+import { useCallback } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import ExportActionButton from "./ExportActionButton";
 import { useExportAction } from "../hooks/useExportAction";
 
 export default function WhitelistExport({ whiteTable, resetKey }) {
-  const exportFn = React.useCallback(() => {
+  const exportFn = useCallback(() => {
     if (!whiteTable) {
       return Promise.reject("沒有白名單資料");
     }
