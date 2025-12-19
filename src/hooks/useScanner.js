@@ -38,9 +38,11 @@ export function useScanner({ findByCode, isWhitelistReady, onScanned } = {}) {
           : "";
       const code = normalize_code(safeRaw ?? inputCode);
       if (!code) {
-        setScanMessage("請先輸入條碼 / 代碼");
+        setScanMessage("請輸入條碼");
         return;
       }
+      
+      setScanMessage("");
 
       const found = findByCode(code);
       const isWhitelisted = !!found;

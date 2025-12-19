@@ -45,7 +45,11 @@ export default function App() {
       </div>
       <div className="right-panel">
         {/* 歷史紀錄面板 */}
-        <HistoryPanel history={history.history} onClear={history.clear_history} />
+        <HistoryPanel
+         history={history.history}
+         onClear={history.clear_history}
+         onRemoveOne={history.remove_record}
+          />
       </div>
     </div>
   );

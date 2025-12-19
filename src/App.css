@@ -109,7 +109,6 @@ body {
   font-weight: 600;
 }
 
-
 /* ------------------------------------
    ScanForm — 掃描輸入與按鈕
 ------------------------------------ */
@@ -150,6 +149,31 @@ body {
   background: var(--magenta-light);
 }
 
+.scan-input-wrapper {
+  position: relative;
+  display: flex;
+  flex: 1;
+}
+
+.scan-pop-message {
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  white-space: nowrap;
+
+  background: rgba(0, 0, 0, 0.85);
+  color: #fff;
+
+  pointer-events: none; /* ⭐ 不影響輸入 */
+
+  animation: popFade 0.65s ease-out forwards;
+  z-index: 5;
+}
 
 /* ------------------------------------
    ScanResult — LED 掃描結果
@@ -198,8 +222,7 @@ body {
 /* ------------------------------------
    Panel (Whitelist / History)
 ------------------------------------ */
-.whitelist-panel,
-.history-panel {
+.whitelist-panel {
   margin-top: 20px;
   padding: 22px;
 
@@ -308,7 +331,7 @@ tr.row-fail {
   background: rgba(255,80,80,0.06);
 }
 
-.history-empty {
+.empty-msg {
   padding: 20px;
   text-align: center;
   color: #aaa;
@@ -321,6 +344,24 @@ tr.row-fail {
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(-6px); }
   to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes popFade {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(4px);
+  }
+  20% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-6px);
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-10px);
+  }
 }
 
 /* ------------------------------------

@@ -3,14 +3,26 @@ import { useCallback, useMemo, useState } from "react";
 
 export function useScanHistory() {
   const [history, setHistory] = useState([]);
-
+  const [ historyVersion, setHistoryVersion] = useState(0);
+  
   const add_record = useCallback((record) => {
     if (!record) return;
-    setHistory((prev) => [record, ...prev]); // 最新在最前
+    setHistory((prev) => [
+      {
+        ...record,
+        _id: crypto.randomUUID()
+      },
+      ...prev]); // 最新在最前
   }, []);
 
   const clear_history = useCallback(() => {
     setHistory([]);
+    setHistoryVersion((v) => v + 1);
+  }, []);
+
+  const remove_record = useCallback((index) => {
+    setHistory((prev) => prev.filter((_, i) => i !== index));
+    setHistoryVersion((v) => v + 1);
   }, []);
 
   // 匯出用純資料
@@ -27,7 +39,9 @@ export function useScanHistory() {
 
   return {
     history,
+    historyVersion,
     add_record,
+    remove_record,
     clear_history,
     export_rows,
   };

@@ -4,7 +4,7 @@ import { invoke } from "@tauri-apps/api/core";
 import ExportActionButton from "./ExportActionButton";
 import { useExportAction } from "../hooks/useExportAction";
 
-export default function ExportHistory({ history, resetKey }) {
+export default function ExportHistory({ history, historyVersion }) {
   const exportFn = useCallback(async () => {
     if (!history || history.length === 0) return;
 
@@ -39,7 +39,7 @@ export default function ExportHistory({ history, resetKey }) {
     isExporting,
   } = useExportAction({
     exportFn,
-    resetKey,
+    historyVersion,
   });
 
   return (
