@@ -2,7 +2,7 @@
 import { useCallback, useMemo, useState } from "react";
 
 export function useScanHistory() {
-  const [history, setHistory] = useState([]);
+  const [ history, setHistory ] = useState([]);
   const [ historyVersion, setHistoryVersion] = useState(0);
   
   const add_record = useCallback((record) => {
@@ -13,6 +13,7 @@ export function useScanHistory() {
         _id: crypto.randomUUID()
       },
       ...prev]); // 最新在最前
+      setHistoryVersion((v) => v + 1);
   }, []);
 
   const clear_history = useCallback(() => {

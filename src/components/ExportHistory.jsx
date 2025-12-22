@@ -39,7 +39,7 @@ export default function ExportHistory({ history, historyVersion }) {
     isExporting,
   } = useExportAction({
     exportFn,
-    historyVersion,
+    resetKey: historyVersion,
   });
 
   return (

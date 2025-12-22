@@ -15,7 +15,9 @@ import { invoke } from "@tauri-apps/api/core";
 export function useExportAction({ exportFn, resetKey }) {
   const [status, setStatus] = useState("idle"); // idle | exporting | done
   const [exportPath, setExportPath] = useState("");
-
+  if (resetKey === undefined) {
+    console.warn("useExportAction: resetKey is undefined");
+  }
   // ----------------------------
   // 資料變動 → 重置狀態
   // ----------------------------

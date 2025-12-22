@@ -11,9 +11,16 @@ export default function HistoryPanel({
   onRemoveOne,    // 🔑 刪除單筆
 }) {
   const { isConfirming, try_action } = useDoubleClickConfirm({
-    onConfirm: ()=>{onClear();}
+    onConfirm: ()=>{
+      onClear();
+    }
   });
-
+  const rowClass = (item) => {
+    return [
+      "center",
+      (item.isWhitelisted ? "row-pass" : "row-fail")
+    ].join(" ");
+  };
   return (
     <div className="history-panel">
       <h2>掃描紀錄</h2>
@@ -47,7 +54,7 @@ export default function HistoryPanel({
                 history.map((item, idx) => (
                   <tr
                     key={item._id}
-                    className={item.isWhitelisted ? "row-pass" : "row-fail"}
+                    className={rowClass(item)}
                   >
                     <td>{item.code}</td>
                     <td>{item.isWhitelisted ? "✔" : "✖"}</td>

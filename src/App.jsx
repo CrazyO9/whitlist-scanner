@@ -49,6 +49,7 @@ export default function App() {
          history={history.history}
          onClear={history.clear_history}
          onRemoveOne={history.remove_record}
+         historyVersion={history.historyVersion}
           />
       </div>
     </div>

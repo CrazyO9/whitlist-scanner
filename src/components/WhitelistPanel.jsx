@@ -17,10 +17,10 @@ export default function WhitelistPanel({
     },
   });
   const [resetKey, setResetKey] = useState(0);
-  
+
   const handleImportedWithReset = (table) => {
-    handle_imported(table);       
-    setResetKey((k) => k + 1);    // 🔁 匯入 → reset
+    handle_imported(table);
+    setResetKey((k) => k + 1); // 🔁 匯入 → reset
   };
 
   // ----------------------------
@@ -34,7 +34,9 @@ export default function WhitelistPanel({
       : [];
 
     // 只保留真的存在於 columns 的欄位，避免 header_order 裡有不存在的 key
-    const ordered = order.filter((h) => Object.prototype.hasOwnProperty.call(columns, h));
+    const ordered = order.filter((h) =>
+      Object.prototype.hasOwnProperty.call(columns, h)
+    );
 
     // fallback：若後端沒給 header_order 或過濾後為空，才用 Object.keys
     return ordered.length > 0 ? ordered : Object.keys(columns);
@@ -71,16 +73,12 @@ export default function WhitelistPanel({
         <h2>白名單管理</h2>
         <div className="panel-actions">
           <WhitelistImport handle_imported={handleImportedWithReset} />
-          <WhitelistExport 
-            whiteTable={whiteTable}
-            resetKey={resetKey}
-          />
+          <WhitelistExport whiteTable={whiteTable} resetKey={resetKey} />
           <button className="clear-btn danger" onClick={try_action}>
             {isConfirming ? "確認" : "清空"}
           </button>
         </div>
       </div>
-
 
       {whiteTable?.file_name && (
         <div className="info-msg">
@@ -89,30 +87,32 @@ export default function WhitelistPanel({
         </div>
       )}
 
-      <div className="whitelist-table">
-        {visibleHeaders.length === 0 ? (
-          <div className="empty-msg">尚未匯入白名單</div>
-        ) : (
-          <table>
-            <thead>
-              <tr>
-                {visibleHeaders.map((key) => (
-                  <th key={key}>{key}</th>
-                ))}
-              </tr>
-            </thead>
-
-            <tbody>
-              {tableRows.map((row, idx) => (
-                <tr key={idx}>
+      <div className="table-scroll">
+        <div className="whitelist-table">
+          {visibleHeaders.length === 0 ? (
+            <div className="empty-msg">尚未匯入白名單</div>
+          ) : (
+            <table>
+              <thead>
+                <tr>
                   {visibleHeaders.map((key) => (
-                    <td key={key}>{row[key]}</td>
+                    <th key={key}>{key}</th>
                   ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+              </thead>
+
+              <tbody>
+                {tableRows.map((row, idx) => (
+                  <tr key={idx} className="center">
+                    {visibleHeaders.map((key) => (
+                      <td key={key}>{row[key]}</td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
       </div>
     </div>
   );
