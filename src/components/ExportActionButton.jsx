@@ -1,51 +1,59 @@
-import {useState, useEffect } from "react";
+// whitelist-scanner\src\components\ExportActionButton.jsx
+import { useState, useEffect } from "react";
 import "./ExportActionButton.css";
+import ExportFormatMenu from "./ExportFormatMenu";
 
 const STATUS_UI = {
   idle: { text: "匯出", busy: false },
-  loading: { text: "匯出中…", busy: true },
-  done: { text: "📂 開啟", busy: false },
+  exporting: { text: "匯出中…", busy: true },
 };
 
 function ExportActionButton({
-  onClick,
+  onExport, // ⭐ 新 API
   status = "idle",
   disabled = false,
   title,
   className = "",
-  successPulseKey = 0,
   leftIcon = null,
+  hasLastExport,
 }) {
+  const [open, setOpen] = useState(false);
   const [pulse, setPulse] = useState(false);
-
-  useEffect(() => {
-    if (successPulseKey <= 0) return;
-    setPulse(true);
-    const timerId = setTimeout(() => setPulse(false), 650);
-    return () => clearTimeout(timerId);
-  }, [successPulseKey]);
-
   const ui = STATUS_UI[status] ?? STATUS_UI.idle;
   const isDisabled = disabled || status === "loading";
 
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={isDisabled}
-      title={title}
-      aria-busy={ui.busy}
-      className={[
-        "export-action-btn",
-        pulse ? "export-action-btn--pulse" : "",
-        className,
-      ].join(" ")}
-    >
-      {pulse && <span className="export-action-btn__pulse-ring" />}
+  const handleSelect = async (format) => {
+    setOpen(false);
+    await onExport(format); // ⭐ 真正匯出
+  };
 
-      {leftIcon}
-      <span>{ui.text}</span>
-    </button>
+  return (
+    <div className="export-action-wrapper">
+      <button
+        type="button"
+        disabled={isDisabled}
+        title={title}
+        aria-busy={ui.busy}
+        className={[
+          "export-action-btn",
+          pulse ? "export-action-btn--pulse" : "",
+          className,
+        ].join(" ")}
+        onClick={() => setOpen((v) => !v)} // ⭐ 打開 menu
+      >
+        {pulse && <span className="export-action-btn__pulse-ring" />}
+        {leftIcon}
+        <span>{ui.text} ▼</span>
+      </button>
+
+      {open && (
+        <ExportFormatMenu
+          onSelect={handleSelect}
+          onClose={() => setOpen(false)}
+          hasLastExport={hasLastExport}
+        />
+      )}
+    </div>
   );
 }
 

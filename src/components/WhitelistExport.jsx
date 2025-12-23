@@ -5,30 +5,42 @@ import ExportActionButton from "./ExportActionButton";
 import { useExportAction } from "../hooks/useExportAction";
 
 export default function WhitelistExport({ whiteTable, resetKey }) {
-  const exportFn = useCallback(() => {
-    if (!whiteTable) {
-      return Promise.reject("沒有白名單資料");
-    }
-    return invoke("export_whitelist", { table: whiteTable });
-  }, [whiteTable]);
+  const exportByFormat = useCallback(
+    async (format) => {
+      if (!whiteTable) {
+        throw new Error("沒有白名單資料");
+      }
+
+      const command = `export_whitelist_${format}`;
+
+      const exportPath = await invoke(command, {
+        table: whiteTable,
+      });
+
+      await invoke("reveal_in_folder", {
+        path: exportPath,
+      });
+
+      return exportPath;
+    },
+    [whiteTable]
+  );
 
   const {
     status,
-    successPulseKey,
-    handleClick,
+    handleExport,
     isExporting,
   } = useExportAction({
-    exportFn,
+    exportFn: exportByFormat,   // ⭐ 注意這裡
     resetKey,
   });
 
   return (
     <ExportActionButton
-      onClick={handleClick}
+      onExport={handleExport}     // ⭐ format 會一路傳進來
       status={status}
       disabled={isExporting}
-      successPulseKey={successPulseKey}
-      title="匯出"
     />
   );
 }
+

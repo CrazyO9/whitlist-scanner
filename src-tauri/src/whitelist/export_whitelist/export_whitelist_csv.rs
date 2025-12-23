@@ -1,3 +1,4 @@
+// whitelist-scanner\src-tauri\src\whitelist\export_whitelist.rs
 use crate::whitelist::model::WhiteTable;
 use std::fs;
 use std::path::PathBuf;
@@ -7,7 +8,7 @@ use tauri::AppHandle;
 /// - 依 header_order 決定欄位順序
 /// - columns 為 column-oriented，需轉為 row-oriented
 #[tauri::command]
-pub async fn export_whitelist(
+pub async fn export_whitelist_csv(
     _app: AppHandle,
     table: WhiteTable,
 ) -> Result<String, String> {
@@ -30,8 +31,9 @@ pub async fn export_whitelist(
 
     // 3. 檔名
     let filename = format!(
-        "whitelist_{}.csv",
-        chrono::Local::now().format("%Y%m%d_%H%M%S")
+        "{}-{}.csv",
+        chrono::Local::now().format("%Y%m%d"),
+        table.file_name
     );
 
     let path: PathBuf = export_dir.join(&filename);

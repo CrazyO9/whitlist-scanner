@@ -24,7 +24,7 @@ pub async fn import_whitelist(path: String) -> Result<WhiteTable, String> {
         return import_xlsx(&path, file_name);
     }
 
-    Err("不支援的檔案格式（CSV / XLSX）".to_string())
+    Err("不支援的檔案格式，限（CSV / XLSX）".to_string())
 }
 
 //////////////////////////////////////////////

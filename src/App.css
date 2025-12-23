@@ -222,7 +222,8 @@ body {
 /* ------------------------------------
    Panel (Whitelist / History)
 ------------------------------------ */
-.whitelist-panel {
+.whitelist-panel,
+.history-panel {
   margin-top: 20px;
   padding: 22px;
   background: rgba(25, 25, 25, 0.85);

@@ -1,3 +1,4 @@
+// whitelist-scanner\src-tauri\src\whitelist\export_history.rs
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::PathBuf;
@@ -12,7 +13,7 @@ pub struct ScanRecord {
 }
 
 #[tauri::command]
-pub async fn export_scan_history(
+pub async fn export_scan_history_csv(
     _app: AppHandle,
     history: Vec<ScanRecord>,
 ) -> Result<String, String> {
@@ -32,21 +33,21 @@ pub async fn export_scan_history(
     }
 
     let filename = format!(
-        "scanHistory_{}.csv",
-        chrono::Local::now().format("%Y%m%d_%H%M%S")
+        "{}-scanHistory.csv",
+        chrono::Local::now().format("%Y%m%d")
     );
 
     let path: PathBuf = export_dir.join(&filename);
 
     // CSV header
-    let mut csv = String::from("時間,代碼,是否通過,商品名稱\n");
+    let mut csv = String::from("\u{FEFF}代碼,是否通過,時間,商品名稱\n");
 
     for r in history {
         let line = format!(
             "\"{}\",\"{}\",\"{}\",\"{}\"\n",
-            r.timestamp,
             r.code,
             if r.is_whitelisted { "PASS" } else { "FAIL" },
+            r.timestamp,
             r.name.unwrap_or_default()
         );
         csv.push_str(&line);

@@ -1,11 +1,11 @@
+// whitelist-scanner\src\hooks\useExportAction.js
 import { useCallback, useEffect, useState } from "react";
-import { invoke } from "@tauri-apps/api/core";
 
 /**
- * 共用匯出流程 Hook
+ * 共用匯出流程 Hook（格式導向）
  *
  * @param {Object} params
- * @param {() => Promise<string>} params.exportFn
+ * @param {(format: string) => Promise<string>} params.exportFn
  *        實際執行匯出的 async function
  *        必須回傳「匯出檔案完整路徑」
  *
@@ -13,47 +13,44 @@ import { invoke } from "@tauri-apps/api/core";
  *        當此值改變時，匯出狀態會自動 reset
  */
 export function useExportAction({ exportFn, resetKey }) {
-  const [status, setStatus] = useState("idle"); // idle | exporting | done
-  const [exportPath, setExportPath] = useState("");
-  if (resetKey === undefined) {
-    console.warn("useExportAction: resetKey is undefined");
-  }
+  const [status, setStatus] = useState("idle"); // idle | exporting
+  const [lastExportPath, setLastExportPath] = useState(null);
+
   // ----------------------------
-  // 資料變動 → 重置狀態
+  // resetKey 改變 → reset 狀態
   // ----------------------------
   useEffect(() => {
     setStatus("idle");
-    setExportPath("");
+    setLastExportPath(null);
   }, [resetKey]);
 
   // ----------------------------
-  // 點擊行為分派
+  // 匯出行為（接收 format）
   // ----------------------------
-  const handleClick = useCallback(async () => {
-    if (status === "idle") {
+  const handleExport = useCallback(
+    async (format) => {
+      if (status === "exporting") return;
+
       try {
         setStatus("exporting");
 
-        const path = await exportFn();
+        const path = await exportFn(format); // ⭐ format 正式進來
 
-        setExportPath(path);
-        setStatus("done");
+        setLastExportPath(path ?? null);
       } catch (err) {
         console.error(err);
+        throw err;
+      } finally {
         setStatus("idle");
       }
-    }
-
-    if (status === "done" && exportPath) {
-      await invoke("reveal_in_folder", { path: exportPath });
-    }
-  }, [status, exportFn, exportPath]);
+    },
+    [status, exportFn]
+  );
 
   return {
     status,
-    exportPath,
     isExporting: status === "exporting",
-    isDone: status === "done",
-    handleClick,
+    lastExportPath,   // ⭐ 給 menu 判斷「是否可開啟」
+    handleExport,     // ⭐ 語意清楚
   };
 }

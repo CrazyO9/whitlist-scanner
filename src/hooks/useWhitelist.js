@@ -1,31 +1,30 @@
 // whitelist-scanner/src/hooks/useWhitelist.js
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { invoke } from "@tauri-apps/api/core";
 import { normalize_code } from "../utils/normalize";
 
 export function useWhitelist() {
-  // 後端 WhiteTable 原始資料
+  /* ----------------------------------
+   * 原始資料（唯一來源）
+   * ---------------------------------- */
   const [whiteTable, setWhiteTable] = useState(null);
 
-  // 前端 entries（陣列格式）
-  const [whitelistEntries, setWhitelistEntries] = useState([]);
-
-  // 查詢用 Map
-  const [whitelistMap, setWhitelistMap] = useState(() => new Map());
-
-  // UI states
+  /* ----------------------------------
+   * UI 狀態
+   * ---------------------------------- */
   const [importedFileName, setImportedFileName] = useState("");
   const [whitelistMessage, setWhitelistMessage] = useState("");
   const [showWhitelistPanel, setShowWhitelistPanel] = useState(false);
-  const [isWhitelistReady, setIsWhitelistReady] = useState(false);
 
-  // 映射
-  // 
+  /* ----------------------------------
+   * 欄位別名（資料正規化）
+   * ---------------------------------- */
   const FIELD_ALIASES = {
     code: ["code", "條碼", "商品條碼", "Barcode", "bar_code", "貨號"],
     name: ["name", "商品名稱", "品名"],
   };
 
-  const normalize_entry = (raw) => {
+  const normalize_entry = useCallback((raw) => {
     const entry = {};
 
     for (const [field, aliases] of Object.entries(FIELD_ALIASES)) {
@@ -37,124 +36,128 @@ export function useWhitelist() {
       }
     }
 
-    // 保留原始欄位（給 UI 用）
     return { ...raw, ...entry };
-  };
+  }, []);
 
-  // --------------------------------------------
-  // 將 WhiteTable.columns 轉陣列 entries
-  // --------------------------------------------
-  const convert_whiteTable_to_entries = useCallback((whiteTable) => {
-    const columns = whiteTable.columns ?? {};
-    const headers = whiteTable.header_order ?? Object.keys(columns);
-    // console.log("WhiteTable from backend:", whiteTableData);
+  /* ----------------------------------
+   * WhiteTable → entries（列）
+   * ---------------------------------- */
+  const whitelistEntries = useMemo(() => {
+    if (!whiteTable?.columns) return [];
+
+    const columns = whiteTable.columns;
+    const headers =
+      whiteTable.header_order && whiteTable.header_order.length > 0
+        ? whiteTable.header_order
+        : Object.keys(columns);
 
     if (headers.length === 0) return [];
 
-    const numRows = Math.min(...headers.map((h) => columns[h].length));
+    const numRows = Math.min(
+      ...headers.map((h) => columns[h]?.length ?? 0)
+    );
 
-    const entries = [];
+    const rows = [];
     for (let i = 0; i < numRows; i++) {
-      const entry = {};
+      const row = {};
       for (const h of headers) {
-        entry[h] = columns[h][i];
+        row[h] = columns[h][i];
       }
-      entries.push(entry);
+      rows.push(normalize_entry(row));
     }
-    return entries;
-  }, []);
 
-  // --------------------------------------------
-  // 由 entries 重建 map
-  // --------------------------------------------
-  const rebuild_map = useCallback((entries) => {
+    return rows.filter((e) => e.code);
+  }, [whiteTable, normalize_entry]);
+
+  /* ----------------------------------
+   * entries → Map（查詢）
+   * ---------------------------------- */
+  const whitelistMap = useMemo(() => {
     const map = new Map();
-    for (const item of entries) {
+    for (const item of whitelistEntries) {
       const key = normalize_code(item.code);
-      if (!key) continue;
-      map.set(key, item);
+      if (key) map.set(key, item);
     }
     return map;
+  }, [whitelistEntries]);
+
+  const isWhitelistReady = whitelistMap.size > 0;
+
+  /* ----------------------------------
+   * 核心管線：白名單進入系統的唯一入口
+   * ---------------------------------- */
+  const apply_whitelist = useCallback((table, message = "") => {
+    setWhiteTable(table);
+    setImportedFileName(table?.file_name ?? "");
+    setWhitelistMessage(message);
   }, []);
 
-  // --------------------------------------------
-  // 處理匯入資料（WhiteTable）
-  // --------------------------------------------
+  /* ----------------------------------
+   * 匯入成功（前端呼叫）
+   * ---------------------------------- */
   const handle_imported = useCallback(
-    (whiteTableData, pathName = "") => {
-      if (!whiteTableData || !whiteTableData.columns) {
-        setWhitelistMessage("匯入資料格式錯誤（缺少 columns）");
+    async (table) => {
+      if (!table?.columns) {
+        setWhitelistMessage("匯入資料格式錯誤");
         return;
       }
 
-      // 1. 設定 WhiteTable
-      setWhiteTable(whiteTableData);
+      apply_whitelist(table, `(${Object.values(table.columns)[0]?.length ?? 0}筆)`);
 
-      // 2. columns → entries 陣列
-      const entries = convert_whiteTable_to_entries(whiteTableData);
-
-      // 3. normalize（把中文欄位對映成 code / name）
-      const normalizedEntries = entries.map(normalize_entry);
-
-      // 4. clean by code（只留下有 code 的列）
-      const cleanEntries = normalizedEntries.filter((e) => e.code);
-
-      // 5. 建 Map
-      const map = rebuild_map(cleanEntries);
-
-      // 6. 更新狀態
-      setWhitelistEntries(cleanEntries);
-      setWhitelistMap(map);
-
-      setImportedFileName(pathName || whiteTableData.file_name || "");
-      setWhitelistMessage(`(${cleanEntries.length}筆)`);
-      setIsWhitelistReady(map.size > 0);
-
+      // ⭐ 同步寫入後端快取
+      await invoke("save_whitelist", { table });
     },
-    [convert_whiteTable_to_entries, rebuild_map]
+    [apply_whitelist]
   );
 
-  // --------------------------------------------
-  // 清空白名單
-  // --------------------------------------------
-  const clear_whitelist = useCallback(() => {
+  /* ----------------------------------
+   * 清空白名單
+   * ---------------------------------- */
+  const clear_whitelist = useCallback(async () => {
     setWhiteTable(null);
-    setWhitelistEntries([]);
-    setWhitelistMap(new Map());
-
     setImportedFileName("");
     setWhitelistMessage("已清空白名單");
-    setIsWhitelistReady(false);
 
-    window.localStorage.removeItem("whitelist_entries");
+    await invoke("clear_last_whitelist");
   }, []);
 
-  // --------------------------------------------
-  // 查詢用函式
-  // --------------------------------------------
+  /* ----------------------------------
+   * 查詢
+   * ---------------------------------- */
   const find_by_code = useCallback(
     (code) => {
       const key = normalize_code(code);
-      return whitelistMap.get(key) || null;
+      return whitelistMap.get(key) ?? null;
     },
     [whitelistMap]
   );
 
-  // --------------------------------------------
-  // whitelist_table（給 UI 表格用）
-  // --------------------------------------------
-  const whitelist_table = useMemo(
-    () =>
-      whitelistEntries.map((entry, index) => ({
-        id: index,
-        ...entry,
-      })),
-    [whitelistEntries]
-  );
+  /* ----------------------------------
+   * App 啟動：自動載入上次白名單
+   * ---------------------------------- */
+  useEffect(() => {
+    let cancelled = false;
 
-  // --------------------------------------------
-  // Panel 控制
-  // --------------------------------------------
+    const load_last = async () => {
+      try {
+        const table = await invoke("load_last_whitelist");
+        if (cancelled) return;
+
+        apply_whitelist(table, `(${Object.values(table.columns)[0]?.length ?? 0}筆)`);
+      } catch {
+        // 沒有上次白名單是正常狀態
+      }
+    };
+
+    load_last();
+    return () => {
+      cancelled = true;
+    };
+  }, [apply_whitelist]);
+
+  /* ----------------------------------
+   * Panel 控制
+   * ---------------------------------- */
   const toggle_whitelist_panel = useCallback(
     () => setShowWhitelistPanel((v) => !v),
     []
@@ -165,20 +168,22 @@ export function useWhitelist() {
     []
   );
 
+  /* ----------------------------------
+   * 對外 API
+   * ---------------------------------- */
   return {
-    // 原始 / 衍生資料
-    whiteTable,          // WhiteTable from backend
-    whitelist_table,     // array for table render
-    whitelistEntries,    // entries array
-    whitelistMap,        // Map for fast lookup
+    // 資料
+    whiteTable,
+    whitelistEntries,
+    whitelistMap,
+    isWhitelistReady,
 
-    // UI 狀態
+    // UI
     importedFileName,
     whitelistMessage,
     showWhitelistPanel,
-    isWhitelistReady,
 
-    // 操作函式
+    // 行為
     handle_imported,
     clear_whitelist,
     toggle_whitelist_panel,
