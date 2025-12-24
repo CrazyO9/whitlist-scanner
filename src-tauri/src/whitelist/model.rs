@@ -16,7 +16,8 @@ pub struct WhiteItem {
 /// header_order: 保留原始檔的欄位順序
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct WhiteTable {
-    pub file_name: String,
+    pub file_name: String, // UI 用
+    pub source_file: String,      // 原始檔名（含副檔名）
     pub columns: HashMap<String, Vec<String>>,
     pub header_order: Vec<String>
 }

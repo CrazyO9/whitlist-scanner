@@ -1,11 +1,11 @@
 // whitelist-scanner/src-tauri/src/whitelist/export_history/export_history_xlsx.rs
-use serde::{Deserialize, Serialize};
+use serde::{ Deserialize, Serialize };
 use std::fs;
 use std::path::PathBuf;
 
 use chrono::Local;
-use tauri::{AppHandle, Manager};
-use rust_xlsxwriter::{Workbook, Format};
+use tauri::{ AppHandle, Manager };
+use rust_xlsxwriter::{ Workbook, Format };
 
 #[derive(Serialize, Deserialize)]
 pub struct ScanRecord {
@@ -18,7 +18,7 @@ pub struct ScanRecord {
 #[tauri::command]
 pub async fn export_scan_history_xlsx(
     app: AppHandle,
-    history: Vec<ScanRecord>,
+    history: Vec<ScanRecord>
 ) -> Result<String, String> {
     if history.is_empty() {
         return Err("沒有可匯出的掃描紀錄".to_string());
@@ -35,10 +35,7 @@ pub async fn export_scan_history_xlsx(
 
     fs::create_dir_all(&export_dir).map_err(|e| e.to_string())?;
 
-    let filename = format!(
-        "{}-scanHistory.xlsx",
-        Local::now().format("%Y%m%d%H%M%S"),
-    );
+    let filename = format!("ScanHistory_{}.xlsx", Local::now().format("%Y%m%d%H%M%S"));
 
     let path: PathBuf = export_dir.join(filename);
 
@@ -61,25 +58,15 @@ pub async fn export_scan_history_xlsx(
     for (idx, r) in history.iter().enumerate() {
         let row = (idx + 1) as u32;
 
-        worksheet
-            .write_string(row, 0, &r.timestamp)
-            .map_err(|e| e.to_string())?;
+        worksheet.write_string(row, 0, &r.timestamp).map_err(|e| e.to_string())?;
+
+        worksheet.write_with_format(row, 1, &r.code, &text_format).map_err(|e| e.to_string())?;
 
         worksheet
-            .write_with_format(row, 1, &r.code, &text_format)
+            .write_string(row, 2, if r.is_whitelisted { "PASS" } else { "FAIL" })
             .map_err(|e| e.to_string())?;
 
-        worksheet
-            .write_string(
-                row,
-                2,
-                if r.is_whitelisted { "PASS" } else { "FAIL" },
-            )
-            .map_err(|e| e.to_string())?;
-
-        worksheet
-            .write_string(row, 3, r.name.as_deref().unwrap_or(""))
-            .map_err(|e| e.to_string())?;
+        worksheet.write_string(row, 3, r.name.as_deref().unwrap_or("")).map_err(|e| e.to_string())?;
     }
 
     workbook.save(&path).map_err(|e| e.to_string())?;

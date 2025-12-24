@@ -1,6 +1,6 @@
 // src/whitelist/import.rs
 use crate::whitelist::model::WhiteTable;
-use calamine::{open_workbook_auto, Data, Reader};
+use calamine::{ open_workbook_auto, Data, Reader };
 use csv::ReaderBuilder;
 use std::collections::HashMap;
 use std::path::Path;
@@ -10,18 +10,24 @@ use std::path::Path;
 pub async fn import_whitelist(path: String) -> Result<WhiteTable, String> {
     let lower = path.to_lowercase();
 
-    let file_name = Path::new(&path)
+    let source_file = Path::new(&path)
         .file_name()
         .and_then(|s| s.to_str())
         .unwrap_or("whitelist")
         .to_string();
 
+    let file_name = Path::new(&source_file)
+        .file_stem() // ⭐ 只取檔名
+        .and_then(|s| s.to_str())
+        .unwrap_or("whitelist")
+        .to_string();
+
     if lower.ends_with(".csv") {
-        return import_csv(&path, file_name);
+        return import_csv(&path, file_name, source_file);
     }
 
     if lower.ends_with(".xlsx") {
-        return import_xlsx(&path, file_name);
+        return import_xlsx(&path, file_name, source_file);
     }
 
     Err("不支援的檔案格式，限（CSV / XLSX）".to_string())
@@ -30,8 +36,7 @@ pub async fn import_whitelist(path: String) -> Result<WhiteTable, String> {
 //////////////////////////////////////////////
 /// 📌 CSV 處理（完全獨立）
 //////////////////////////////////////////////
-
-fn import_csv(path: &str, file_name: String) -> Result<WhiteTable, String> {
+fn import_csv(path: &str, file_name: String, source_file: String) -> Result<WhiteTable, String> {
     let mut reader = ReaderBuilder::new()
         .has_headers(true)
         .from_path(path)
@@ -46,8 +51,10 @@ fn import_csv(path: &str, file_name: String) -> Result<WhiteTable, String> {
 
     let header_order = headers.clone();
 
-    let mut columns: HashMap<String, Vec<String>> =
-        headers.iter().map(|h| (h.clone(), vec![])).collect();
+    let mut columns: HashMap<String, Vec<String>> = headers
+        .iter()
+        .map(|h| (h.clone(), vec![]))
+        .collect();
 
     for record in reader.records() {
         let r = record.map_err(|e| e.to_string())?;
@@ -59,26 +66,19 @@ fn import_csv(path: &str, file_name: String) -> Result<WhiteTable, String> {
         }
     }
 
-    Ok(WhiteTable { file_name, columns, header_order })
+    Ok(WhiteTable { file_name, source_file, columns, header_order })
 }
 
 //////////////////////////////////////////////
 /// 📌 XLSX 處理（完全獨立）
 //////////////////////////////////////////////
-
-fn import_xlsx(path: &str, file_name: String) -> Result<WhiteTable, String> {
+fn import_xlsx(path: &str, file_name: String, source_file: String) -> Result<WhiteTable, String> {
     let mut workbook = open_workbook_auto(path).map_err(|e| e.to_string())?;
 
     // ---- 找第一個工作表 ----
-    let sheet = workbook
-        .sheet_names()
-        .first()
-        .cloned()
-        .ok_or("找不到工作表".to_string())?;
+    let sheet = workbook.sheet_names().first().cloned().ok_or("找不到工作表".to_string())?;
 
-    let range = workbook
-        .worksheet_range(&sheet)
-        .map_err(|e| e.to_string())?;
+    let range = workbook.worksheet_range(&sheet).map_err(|e| e.to_string())?;
 
     let mut rows = range.rows();
 
@@ -87,17 +87,21 @@ fn import_xlsx(path: &str, file_name: String) -> Result<WhiteTable, String> {
 
     let headers: Vec<String> = header_row
         .iter()
-        .map(|cell| match cell {
-            Data::String(s) => s.clone(),
-            _ => cell.to_string(),
+        .map(|cell| {
+            match cell {
+                Data::String(s) => s.clone(),
+                _ => cell.to_string(),
+            }
         })
         .collect();
 
     let header_order = headers.clone();
 
     // ---- 建立 HashMap 用於存每一欄 ----
-    let mut columns: HashMap<String, Vec<String>> =
-        headers.iter().map(|h| (h.clone(), vec![])).collect();
+    let mut columns: HashMap<String, Vec<String>> = headers
+        .iter()
+        .map(|h| (h.clone(), vec![]))
+        .collect();
 
     for row in rows {
         for (idx, cell) in row.iter().enumerate() {
@@ -111,5 +115,5 @@ fn import_xlsx(path: &str, file_name: String) -> Result<WhiteTable, String> {
         }
     }
 
-    Ok(WhiteTable { file_name, columns, header_order })
+    Ok(WhiteTable { file_name, source_file, columns, header_order })
 }

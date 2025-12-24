@@ -2,38 +2,33 @@
 use crate::whitelist::model::WhiteTable;
 use std::fs;
 use std::path::PathBuf;
-use tauri::AppHandle;
+use tauri::{AppHandle, Manager};
 
 /// 匯出白名單（CSV）
 /// - 依 header_order 決定欄位順序
 /// - columns 為 column-oriented，需轉為 row-oriented
 #[tauri::command]
-pub async fn export_whitelist_csv(
-    _app: AppHandle,
-    table: WhiteTable,
-) -> Result<String, String> {
+pub async fn export_whitelist_csv(app: AppHandle, table: WhiteTable) -> Result<String, String> {
     if table.header_order.is_empty() {
         return Err("白名單沒有欄位可匯出".to_string());
     }
 
-    // 1. 取得程式目錄
-    let exe_dir = std::env::current_exe()
+    /* --------------------------------
+     * 匯出資料夾
+     * -------------------------------- */
+    let export_dir = app
+        .path()
+        .app_data_dir()
         .map_err(|e| e.to_string())?
-        .parent()
-        .ok_or("找不到程式目錄")?
-        .to_path_buf();
+        .join("export");
 
-    // 2. 建立 export 資料夾
-    let export_dir = exe_dir.join("export");
-    if !export_dir.exists() {
-        fs::create_dir_all(&export_dir).map_err(|e| e.to_string())?;
-    }
+    fs::create_dir_all(&export_dir).map_err(|e| e.to_string())?;
 
     // 3. 檔名
     let filename = format!(
-        "{}-{}.csv",
-        chrono::Local::now().format("%Y%m%d"),
-        table.file_name
+        "{}_{}.csv",
+        table.file_name,
+        chrono::Local::now().format("%Y%m%d%H%M%S")
     );
 
     let path: PathBuf = export_dir.join(&filename);
@@ -41,31 +36,32 @@ pub async fn export_whitelist_csv(
     // 4. CSV Header（依 header_order）
     let mut csv = String::from("\u{FEFF}");
     csv.push_str(
-        &table
-            .header_order
+        &table.header_order
             .iter()
             .map(|h| escape_csv(h))
             .collect::<Vec<_>>()
-            .join(","),
+            .join(",")
     );
     csv.push('\n');
 
     // 5. 計算列數（最安全：取最短欄位）
-    let num_rows = table
-        .header_order
+    let num_rows = table.header_order
         .iter()
-        .map(|h| table.columns.get(h).map(|c| c.len()).unwrap_or(0))
+        .map(|h|
+            table.columns
+                .get(h)
+                .map(|c| c.len())
+                .unwrap_or(0)
+        )
         .min()
         .unwrap_or(0);
 
     // 6. 組 rows
     for row_idx in 0..num_rows {
-        let row = table
-            .header_order
+        let row = table.header_order
             .iter()
             .map(|h| {
-                table
-                    .columns
+                table.columns
                     .get(h)
                     .and_then(|col| col.get(row_idx))
                     .map(|v| escape_csv(v))

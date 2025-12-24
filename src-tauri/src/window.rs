@@ -8,7 +8,7 @@ pub fn setup_main_window<R: tauri::Runtime>(
         if let Some(monitor) = window.current_monitor()? {
             let monitor_size = monitor.size();
 
-            let taskbar_height: f64 = 70.0;
+            let taskbar_height: f64 = 75.0;
             let min_height = 400.0;
 
             let width = 1024.0;

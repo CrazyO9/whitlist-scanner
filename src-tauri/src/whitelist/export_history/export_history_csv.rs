@@ -2,7 +2,7 @@
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::PathBuf;
-use tauri::AppHandle;
+use tauri::{AppHandle, Manager};
 
 #[derive(Serialize, Deserialize)]
 pub struct ScanRecord {
@@ -14,27 +14,27 @@ pub struct ScanRecord {
 
 #[tauri::command]
 pub async fn export_scan_history_csv(
-    _app: AppHandle,
+    app: AppHandle,
     history: Vec<ScanRecord>,
 ) -> Result<String, String> {
     if history.is_empty() {
         return Err("沒有可匯出的掃描紀錄".to_string());
     }
 
-    let exe_dir = std::env::current_exe()
+    /* --------------------------------
+     * 匯出資料夾
+     * -------------------------------- */
+    let export_dir = app
+        .path()
+        .app_data_dir()
         .map_err(|e| e.to_string())?
-        .parent()
-        .ok_or("找不到程式目錄")?
-        .to_path_buf();
+        .join("export");
 
-    let export_dir = exe_dir.join("export");
-    if !export_dir.exists() {
-        fs::create_dir_all(&export_dir).map_err(|e| e.to_string())?;
-    }
+    fs::create_dir_all(&export_dir).map_err(|e| e.to_string())?;
 
     let filename = format!(
-        "{}-scanHistory.csv",
-        chrono::Local::now().format("%Y%m%d")
+        "ScanHistory_{}.csv",
+        chrono::Local::now().format("%Y%m%d%H%M%S")
     );
 
     let path: PathBuf = export_dir.join(&filename);

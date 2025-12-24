@@ -32,9 +32,9 @@ pub async fn export_whitelist_xlsx(
     fs::create_dir_all(&export_dir).map_err(|e| e.to_string())?;
 
     let filename = format!(
-        "{}-{}",
-        Local::now().format("%Y%m%d"),
-        table.file_name
+        "{}_{}.xlsx",
+        table.file_name,
+        Local::now().format("%Y%m%d%H%M%S")
     );
 
     let path: PathBuf = export_dir.join(filename);
