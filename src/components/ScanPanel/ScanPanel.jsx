@@ -1,8 +1,9 @@
-// whitelist-scanner/src/components/ResultPanel.jsx
+// whitelist-scanner/src/components/ScanPanel.jsx
 import { useState, useEffect } from "react";
 import ScanForm from "./ScanForm";
 import ScanResult from "./ScanResult";
-import { useScanSound } from "../hooks/useScanSound";
+import { useScanSound } from "../../hooks/useScanSound";
+import ScanSettings from "./ScanButton/ScanSettings";
 
 export default function ScanPanel({
   scanner, // useScanner 回傳物件
@@ -10,6 +11,9 @@ export default function ScanPanel({
 }) {
   const [showMessage, setShowMessage] = useState(false);
   const [scanAttemptId, setScanAttemptId] = useState(0);
+  const [showSettings, setShowSettings] = useState(false);
+  const [soundPassEnabled, setSoundPassEnabled] = useState(true);
+  const [soundFailEnabled, setSoundFailEnabled] = useState(true);
 
   const {
     inputCode,
@@ -20,11 +24,14 @@ export default function ScanPanel({
     do_scan,
   } = scanner;
 
-  const { play } = useScanSound();
+  const { play } = useScanSound({
+    soundPassEnabled,
+    soundFailEnabled,
+  });
 
   useEffect(() => {
     if (!lastScanResult) return;
-    const type = lastScanResult.isWhitelisted ? "success" : "fail";
+    const type = lastScanResult.isWhitelisted ? "pass" : "fail";
 
     play(type);
   }, [lastScanResult, play]);
@@ -47,7 +54,26 @@ export default function ScanPanel({
 
   return (
     <div className="result-panel">
-      <h2>掃描器</h2>
+      <div>
+        <h2>掃描器</h2>
+        <button
+          className="settings-button"
+          onClick={() => setShowSettings((v) => !v)}
+        >
+          ⚙
+        </button>
+        {showSettings && (
+          <ScanSettings
+            soundPassEnabled={soundPassEnabled}
+            soundFailEnabled={soundFailEnabled}
+            // isDarkMode={}
+            onToggleSoundPass={() => setSoundPassEnabled((v) => !v)}
+            onToggleSoundFail={() => setSoundFailEnabled((v) => !v)}
+            // onToggleTheme={}
+            // onOpenExportFolder={}
+          />
+        )}
+      </div>
       <ScanForm
         inputCode={inputCode}
         onInputChange={handle_input_change}

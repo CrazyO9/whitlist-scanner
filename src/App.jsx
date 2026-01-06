@@ -5,7 +5,7 @@ import { useWhitelist } from "./hooks/useWhitelist";
 import { useScanHistory } from "./hooks/useScanHistory";
 import { useScanner } from "./hooks/useScanner";
 
-import ScanPanel from "./components/ScanPanel";
+import ScanPanel from "./components/ScanPanel/ScanPanel";
 import HistoryPanel from "./components/HistoryPanel";
 import WhitelistPanel from "./components/WhitelistPanel";
 
