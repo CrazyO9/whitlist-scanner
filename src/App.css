@@ -8,16 +8,18 @@
 body {
   margin: 0;
   padding: 0;
-  background: #1b1b1b;
+  background: var(--bg-main);
   font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
-  color: #e6e6e6;
+  color: var(--text-main);
 }
 
 /* ------------------------------------
    Viva Magenta 色彩
 ------------------------------------ */
 :root {
-  --magenta: #bb2649;          /* 主色 Viva Magenta */
+  --bg-main: #1b1b1b;
+  --text-main: #e6e6e6;
+  --magenta: #bb2649; /* 主色 Viva Magenta */
   --magenta-light: #d9365f;
   --magenta-trans: rgba(187, 38, 73, 0.4);
 
@@ -28,11 +30,19 @@ body {
   --fail-glow: rgba(255, 80, 80, 0.45);
 }
 
+.theme-light {
+  --bg-main: #f5f5f5;
+  --text-main: #1b1b1b;
+
+  --glass-bg: rgba(0, 0, 0, 0.04);
+  --glass-border: rgba(0, 0, 0, 0.12);
+}
+
 /* ------------------------------------
    App.jsx
 ------------------------------------ */
 .app-layout {
-  display: grid;  
+  display: grid;
   /* CSS Grid 官方最佳實務之一：「主欄位用固定 / minmax，副欄位才用 fr」 */
   grid-template-columns: minmax(420px, 520px) 1fr; /* 左大右小，可自行調 */
   height: 100vh;
@@ -61,7 +71,7 @@ body {
   gap: 12px;
   margin-bottom: 20px;
 
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.051);
   border: 1px solid var(--glass-border);
   padding: 12px;
   border-radius: 14px;
@@ -71,8 +81,8 @@ body {
 .toolbar-btn {
   padding: 10px 18px;
   border-radius: 10px;
-  border: 1px solid rgba(255,255,255,0.15);
-  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.1);
   cursor: pointer;
   font-size: 14px;
   color: #fff;
@@ -80,13 +90,12 @@ body {
 }
 
 .toolbar-btn:hover {
-  background: rgba(255,255,255,0.18);
+  background: rgba(255, 255, 255, 0.18);
 }
 
 .toolbar-btn.danger:hover {
   background: rgba(187, 38, 73, 0.28);
 }
-
 
 /* ------------------------------------
    ResultPanel — 掃描主框
@@ -123,15 +132,15 @@ body {
   padding: 14px;
   font-size: 18px;
   border-radius: 12px;
-  border: 1px solid rgba(255,255,255,0.18);
-  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.1);
   color: #fff;
 }
 
 .scan-input:focus {
   outline: none;
   border-color: var(--magenta-light);
-  background: rgba(255,255,255,0.16);
+  background: rgba(255, 255, 255, 0.16);
 }
 
 .scan-btn {
@@ -181,24 +190,24 @@ body {
 .scan-result {
   padding: 18px;
   border-radius: 14px;
-  border: 1px solid rgba(255,255,255,0.15);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   margin-top: 10px;
 }
 
 .scan-result.pass {
-  background: rgba(60, 255, 150, 0.10);
-  border-color: rgba(60,255,150,0.4);
+  background: rgba(60, 255, 150, 0.1);
+  border-color: rgba(60, 255, 150, 0.4);
   box-shadow: 0 0 10px var(--success-glow);
 }
 
 .scan-result.fail {
-  background: rgba(255, 80, 80, 0.10);
-  border-color: rgba(255,80,80,0.4);
+  background: rgba(255, 80, 80, 0.1);
+  border-color: rgba(255, 80, 80, 0.4);
   box-shadow: 0 0 10px var(--fail-glow);
 }
 
 .scan-result.empty {
-  background: rgba(255,255,255,0.04);
+  background: rgba(255, 255, 255, 0.04);
   color: #aaa;
 }
 
@@ -217,7 +226,6 @@ body {
   font-size: 14px;
   color: #bbb;
 }
-
 
 /* ------------------------------------
    Panel (Whitelist / History)
@@ -272,13 +280,13 @@ body {
 
 .table-scroll {
   width: 100%;
-  overflow-x: auto;     /* ⭐ 橫向捲動 */
+  overflow-x: auto; /* ⭐ 橫向捲動 */
   overflow-y: hidden;
 }
 
 .whitelist-table {
-  width: max-content;   /* ⭐ 關鍵 */
-  min-width: 100%;      /* 至少撐滿 panel */
+  width: max-content; /* ⭐ 關鍵 */
+  min-width: 100%; /* 至少撐滿 panel */
   border-collapse: collapse;
 }
 
@@ -290,21 +298,21 @@ body {
   position: relative;
   padding: 10px 14px;
   border-radius: 10px;
-  background: rgba(255,255,255,0.1);
-  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   cursor: pointer;
   color: #fff;
   transition: 0.25s;
 }
 
 .import-btn {
-  display: inline-flex;   /* 讓它像 button，不會跑版 */
+  display: inline-flex; /* 讓它像 button，不會跑版 */
 }
 
 .import-btn:hover,
 .clear-btn:hover,
 .export-history-btn:hover {
-  background: rgba(255,255,255,0.18);
+  background: rgba(255, 255, 255, 0.18);
 }
 
 .clear-btn.danger {
@@ -324,16 +332,16 @@ table {
 
 th {
   padding: 10px;
-  background: rgba(255,255,255,0.08);
+  background: rgba(255, 255, 255, 0.08);
   color: #eee;
-  border-bottom: 1px solid rgba(255,255,255,0.20);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 td {
   padding: 10px;
   color: #ddd;
   vertical-align: middle;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 tr.center {
@@ -349,11 +357,11 @@ tr.left {
 }
 
 tr.row-pass {
-  background: rgba(60,255,150,0.06);
+  background: rgba(60, 255, 150, 0.06);
 }
 
 tr.row-fail {
-  background: rgba(255,80,80,0.06);
+  background: rgba(255, 80, 80, 0.06);
 }
 
 .empty-msg {
@@ -362,13 +370,18 @@ tr.row-fail {
   color: #aaa;
 }
 
-
 /* ------------------------------------
    動畫
 ------------------------------------ */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-6px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes popFade {

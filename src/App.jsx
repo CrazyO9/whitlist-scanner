@@ -8,6 +8,7 @@ import { useScanner } from "./hooks/useScanner";
 import ScanPanel from "./components/ScanPanel/ScanPanel";
 import HistoryPanel from "./components/HistoryPanel";
 import WhitelistPanel from "./components/WhitelistPanel";
+import { usePreferences } from "./hooks/usePreferences";
 
 export default function App() {
   /** --------------------------------------
@@ -15,7 +16,8 @@ export default function App() {
    * -------------------------------------- */
   const whitelist = useWhitelist();
   const history = useScanHistory();
-
+  const { preferences, setPreference } = usePreferences();
+  const { lightModeEnable } = preferences;
   // 掃描器：改查詢至 whitelist.find_by_code（entries 已自動轉換）
   const scanner = useScanner({
     findByCode: whitelist.find_by_code,
@@ -26,7 +28,7 @@ export default function App() {
    * 3. 主畫面 Layout
    * -------------------------------------- */
   return (
-    <div className="app-layout">
+    <div className={`app-layout ${lightModeEnable && "theme-light"}`}>
       <div className="left-panel">
         {/* 主掃描畫面 */}
         <ScanPanel
@@ -36,7 +38,7 @@ export default function App() {
 
         {/* 白名單面板 */}
         <WhitelistPanel
-          whiteTable={whitelist.whiteTable}            // ✔ 改為 WhiteTable
+          whiteTable={whitelist.whiteTable} // ✔ 改為 WhiteTable
           whitelistMessage={whitelist.whitelistMessage}
           handle_imported={whitelist.handle_imported}
           clearWhitelist={whitelist.clear_whitelist}
@@ -46,11 +48,11 @@ export default function App() {
       <div className="right-panel">
         {/* 歷史紀錄面板 */}
         <HistoryPanel
-         history={history.history}
-         onClear={history.clear_history}
-         onRemoveOne={history.remove_record}
-         historyVersion={history.historyVersion}
-          />
+          history={history.history}
+          onClear={history.clear_history}
+          onRemoveOne={history.remove_record}
+          historyVersion={history.historyVersion}
+        />
       </div>
     </div>
   );

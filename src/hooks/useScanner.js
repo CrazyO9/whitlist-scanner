@@ -41,7 +41,7 @@ export function useScanner({ findByCode, isWhitelistReady, onScanned } = {}) {
         setScanMessage("請輸入條碼");
         return;
       }
-      
+
       setScanMessage("");
 
       const found = findByCode(code);
@@ -53,6 +53,8 @@ export function useScanner({ findByCode, isWhitelistReady, onScanned } = {}) {
         isWhitelisted,
         timestamp,
         entry: found,
+        source: "scan",
+        scanAttempId: crypto.randomUUID(),
       };
 
       setLastScanResult(record);
