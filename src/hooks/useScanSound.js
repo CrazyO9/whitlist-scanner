@@ -1,10 +1,11 @@
 // whitelist-scanner\src\hooks\useScanSound.js
 import { useRef } from "react";
+import { usePreferencesContext } from "../context/PreferencesContext";
 
-export function useScanSound({
-  soundPassEnabled = true,
-  soundFailEnabled = true,
-} = {}) {
+export function useScanSound() {
+  const { preferences } = usePreferencesContext();
+  const { soundPassEnabled, soundFailEnabled } = preferences;
+
   const soundsRef = useRef({
     pass: new Audio("/sound/pass.mp3"),
     fail: new Audio("/sound/fail.mp3"),
@@ -19,5 +20,6 @@ export function useScanSound({
     audio.currentTime = 0;
     audio.play().catch(() => {});
   };
+
   return { play };
 }

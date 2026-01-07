@@ -6,7 +6,7 @@ export default function ScanResult({ result }) {
     return;
   }
 
-  const { code, isWhitelisted, entry, timestamp } = result;
+  const { code, isWhitelisted, timestamp } = result;
 
   return (
     <div

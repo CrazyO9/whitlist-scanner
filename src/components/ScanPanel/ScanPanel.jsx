@@ -1,21 +1,21 @@
 // whitelist-scanner/src/components/ScanPanel.jsx
+import "./Popover.css"
 import { useState, useEffect } from "react";
 import ScanForm from "./ScanForm";
 import ScanResult from "./ScanResult";
+import ScanSettings from "../SettingsButton/SettingsButton";
 import { useScanSound } from "../../hooks/useScanSound";
-import ScanSettings from "./ScanButton/ScanSettings";
-import { usePreferences } from "../../hooks/usePreferences";
+import { usePreferencesContext } from "../../context/PreferencesContext";
+import SettingsModal from "../SettingsButton/SettingsModal";
 
 export default function ScanPanel({
   scanner, // useScanner 回傳物件
   whitelistReady, // 來自 useWhitelist.isWhitelistReady
+  onOpenSettings,
 }) {
   const [showMessage, setShowMessage] = useState(false);
-  const [scanAttemptId, setScanAttemptId] = useState(0);
-  const [showSettings, setShowSettings] = useState(false);
-  const { preferences, setPreference } = usePreferences();
+  const [scanAttempId, setScanAttempId] = useState(0);
 
-  const { soundPassEnabled, soundFailEnabled, darkMode } = preferences;
   const {
     inputCode,
     lastScanResult,
@@ -25,22 +25,19 @@ export default function ScanPanel({
     do_scan,
   } = scanner;
 
-  const { play } = useScanSound({
-    soundPassEnabled,
-    soundFailEnabled,
-  });
+  const { play } = useScanSound();
 
   useEffect(() => {
     if (!lastScanResult) return;
     if (lastScanResult.source !== "scan") return;
-    
+
     const type = lastScanResult.isWhitelisted ? "pass" : "fail";
     play(type);
   }, [lastScanResult?.scanAttempId]);
 
   const handleScan = (code) => {
     do_scan(code);
-    setScanAttemptId((t) => t + 1);
+    setScanAttempId((t) => t + 1);
   };
 
   useEffect(() => {
@@ -52,36 +49,20 @@ export default function ScanPanel({
     }, 650);
 
     return () => clearTimeout(timerId);
-  }, [scanAttemptId]);
+  }, [scanAttempId]);
 
   return (
-    <div className="result-panel">
-      <div>
+    <div className="scan-panel">
+      <header className="scan-header">
         <h2>掃描器</h2>
         <button
           className="settings-button"
-          onClick={() => setShowSettings((v) => !v)}
+          onClick={onOpenSettings}
+          aria-label="settings"
         >
           ⚙
         </button>
-        {showSettings && (
-          <ScanSettings
-            soundPassEnabled={soundPassEnabled}
-            soundFailEnabled={soundFailEnabled}
-            isDarkMode={darkMode}
-            onToggleSoundPass={() =>
-              setPreference("soundPassEnabled", !soundPassEnabled)
-            }
-            onToggleSoundFail={() =>
-              setPreference("soundFailEnabled", !soundFailEnabled)
-            }
-            onToggleTheme={() => {
-              setPreference("darkMode", !darkMode);
-            }}
-            // onOpenExportFolder={handleOpenExportFolder}
-          />
-        )}
-      </div>
+      </header>
       <ScanForm
         inputCode={inputCode}
         onInputChange={handle_input_change}
@@ -89,7 +70,7 @@ export default function ScanPanel({
         onScan={handleScan}
         disabled={!whitelistReady}
         message={scanMessage}
-        scanAttemptId={scanAttemptId}
+        scanAttempId={scanAttempId}
         showMessage={showMessage}
       />
 
