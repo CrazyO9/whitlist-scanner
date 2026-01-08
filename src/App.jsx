@@ -1,6 +1,6 @@
 // whitelist-scanner/src/App.jsx
 import "./App.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useWhitelist } from "./hooks/useWhitelist";
 import { useScanHistory } from "./hooks/useScanHistory";
 import { useScanner } from "./hooks/useScanner";
@@ -28,14 +28,18 @@ export default function App() {
     onScanned: history.add_record,
   });
 
+  useEffect(() => {
+    const root = document.documentElement;
+
+    root.classList.toggle("theme-light", lightModeEnabled);
+    root.classList.toggle("theme-dark", !lightModeEnabled);
+  }, [lightModeEnabled]);
   /** --------------------------------------
    * 3. 主畫面 Layout
    * -------------------------------------- */
   return (
     <div
-      className={`app-layout ${
-        lightModeEnabled ? "theme-light" : "theme-dark"
-      }`}
+      className={`app-layout`}
     >
       {showSettings && (
         <SettingsModal onClose={() => setShowSettings(false)}>

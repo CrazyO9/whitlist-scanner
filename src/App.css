@@ -129,10 +129,10 @@ body {
 }
 
 /* Right panel separator */
-.right-panel {
+/* .right-panel {
   border-left: 1px solid var(--glass-border);
   padding-left: var(--gap);
-}
+} */
 
 /* ------------------------------------
    5) ToolBar
@@ -451,7 +451,8 @@ tr.row-fail {
    11) Buttons (Import / Clear)
 ------------------------------------ */
 .import-btn,
-.clear-btn {
+.clear-btn,
+.settings-action-btn {
   position: relative;
   padding: 10px 14px;
   border-radius: 10px;
@@ -539,6 +540,7 @@ tr.row-fail {
   align-items: center;
   justify-content: space-between;
   padding: 10px 0;
+  cursor: pointer;
 }
 
 .settings-label {
