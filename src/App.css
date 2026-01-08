@@ -1,89 +1,167 @@
 /* ============================================================
-   Viva Magenta Full Theme — Dark Tech + Magenta Accent
+   Viva Magenta Theme System — Dark Tech + Light Day Variant
+   - Dark 為預設主題
+   - Light 以 .theme-light 覆寫變數
+   - Modal/Popover 統一：遮罩 + 玻璃面 + 置中 + 全域覆蓋
 ============================================================ */
 
 /* ------------------------------------
-   全域設定（深色 + 高科技感）
+   1) Base tokens (shared)
+------------------------------------ */
+:root {
+  /* Accent (Viva Magenta) */
+  --magenta: #bb2649;
+  --magenta-light: #d9365f;
+  --magenta-trans: rgba(187, 38, 73, 0.4);
+
+  /* Status glow */
+  --success-glow: rgba(60, 255, 150, 0.45);
+  --fail-glow: rgba(255, 80, 80, 0.45);
+
+  /* Radius / spacing */
+  --r-xl: 16px;
+  --r-lg: 14px;
+  --r-md: 12px;
+  --gap: 12px;
+
+  /* Motion */
+  --t-fast: 0.2s;
+  --t: 0.25s;
+
+  /* Default = Dark variables */
+  --bg-main: #1b1b1b;
+  --bg-panel: rgba(25, 25, 25, 0.85);
+
+  --text-main: #e6e6e6;
+  --text-muted: #aaa;
+
+  --glass-bg: rgba(255, 255, 255, 0.06);
+  --glass-border: rgba(255, 255, 255, 0.15);
+
+  --shadow-panel: 0 24px 60px rgba(0, 0, 0, 0.35);
+
+  /* Backdrop (modal overlay) */
+  --overlay-bg: rgba(0, 0, 0, 0.45);
+
+  /* Table */
+  --table-th-bg: rgba(255, 255, 255, 0.08);
+  --table-td-border: rgba(255, 255, 255, 0.08);
+
+  /* Inputs */
+  --input-bg: rgba(255, 255, 255, 0.1);
+  --input-bg-focus: rgba(255, 255, 255, 0.16);
+  --input-border: rgba(255, 255, 255, 0.18);
+
+  /* Buttons */
+  --btn-bg: rgba(255, 255, 255, 0.1);
+  --btn-bg-hover: rgba(255, 255, 255, 0.18);
+
+  /* Scrollbar*/
+  --scrollbar-track: rgba(255, 255, 255, 0.04);
+  --scrollbar-thumb: rgba(255, 255, 255, 0.22);
+  --scrollbar-thumb-hover: rgba(255, 255, 255, 0.35);
+}
+
+/* ------------------------------------
+   2) Theme overrides (Light)
+------------------------------------ */
+.theme-light {
+  --bg-main: #f4f5f7;
+  --bg-panel: rgba(255, 255, 255, 0.92);
+
+  --text-main: #1b1b1b;
+  --text-muted: #666;
+
+  --glass-bg: rgba(255, 255, 255, 0.72);
+  --glass-border: rgba(0, 0, 0, 0.12);
+
+  --shadow-panel: 0 24px 60px rgba(0, 0, 0, 0.18);
+
+  --overlay-bg: rgba(255, 255, 255, 0.55);
+
+  --table-th-bg: rgba(0, 0, 0, 0.04);
+  --table-td-border: rgba(0, 0, 0, 0.08);
+
+  --input-bg: rgba(0, 0, 0, 0.03);
+  --input-bg-focus: rgba(0, 0, 0, 0.06);
+  --input-border: rgba(0, 0, 0, 0.12);
+
+  --btn-bg: rgba(0, 0, 0, 0.04);
+  --btn-bg-hover: rgba(0, 0, 0, 0.07);
+  
+  --scrollbar-track: rgba(0, 0, 0, 0.04);
+  --scrollbar-thumb: rgba(0, 0, 0, 0.25);
+  --scrollbar-thumb-hover: rgba(0, 0, 0, 0.4);
+}
+
+/* ------------------------------------
+   3) Global base
 ------------------------------------ */
 body {
   margin: 0;
   padding: 0;
   background: var(--bg-main);
-  font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
   color: var(--text-main);
+  font-family: "Segoe UI", "Microsoft JhengHei", sans-serif;
 }
 
-/* ------------------------------------
-   Viva Magenta 色彩
------------------------------------- */
-:root {
-  --bg-main: #1b1b1b;
-  --bg-panel: rgba(25, 25, 25, 0.85);
-  --text-main: #e6e6e6;
-  --magenta: #bb2649; /* 主色 Viva Magenta */
-  --magenta-light: #d9365f;
-  --magenta-trans: rgba(187, 38, 73, 0.4);
-
-  --glass-bg: rgba(255, 255, 255, 0.06);
-  --glass-border: rgba(255, 255, 255, 0.15);
-
-  --success-glow: rgba(60, 255, 150, 0.45);
-  --fail-glow: rgba(255, 80, 80, 0.45);
-}
-
-/* ------------------------------------
-   App.jsx
------------------------------------- */
-.app-layout {
-  display: grid;
-  /* CSS Grid 官方最佳實務之一：「主欄位用固定 / minmax，副欄位才用 fr」 */
-  grid-template-columns: minmax(420px, 520px) 1fr; /* 左大右小，可自行調 */
-  height: 100vh;
-  gap: 12px;
-  padding: 12px;
+* {
   box-sizing: border-box;
 }
 
-/* 左右欄都可各自捲動 */
+/* ------------------------------------
+   4) App layout (reduce layout jump)
+------------------------------------ */
+.app-layout {
+  display: grid;
+  width: 100%;
+  grid-template-columns: minmax(420px, 520px) 1fr;
+  height: 100vh;
+  gap: var(--gap);
+  padding: 0 var(--gap);
+  background-color: var(--bg-main);
+}
+
+/* Left / right independent scroll */
 .left-panel,
 .right-panel {
   overflow: auto;
 }
 
-/* 右欄視覺上像資訊面板 */
+/* Right panel separator */
 .right-panel {
-  border-left: 1px solid #ddd;
-  padding-left: 12px;
+  border-left: 1px solid var(--glass-border);
+  padding-left: var(--gap);
 }
 
 /* ------------------------------------
-   ToolBar — Magenta 控制列
+   5) ToolBar
 ------------------------------------ */
 .tool-bar {
   display: flex;
-  gap: 12px;
+  gap: var(--gap);
   margin-bottom: 20px;
 
-  background: rgba(255, 255, 255, 0.051);
+  background: color-mix(in srgb, var(--glass-bg) 85%, transparent);
   border: 1px solid var(--glass-border);
   padding: 12px;
-  border-radius: 14px;
+  border-radius: var(--r-lg);
   backdrop-filter: blur(8px);
 }
 
 .toolbar-btn {
   padding: 10px 18px;
   border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--glass-border);
+  background: var(--btn-bg);
   cursor: pointer;
   font-size: 14px;
-  color: #fff;
-  transition: 0.25s ease;
+  color: var(--text-main);
+  transition: var(--t) ease;
 }
 
 .toolbar-btn:hover {
-  background: rgba(255, 255, 255, 0.18);
+  background: var(--btn-bg-hover);
 }
 
 .toolbar-btn.danger:hover {
@@ -91,17 +169,18 @@ body {
 }
 
 /* ------------------------------------
-   ResultPanel — 掃描主框
+   6) ScanPanel (sticky)
 ------------------------------------ */
 .scan-panel {
   position: sticky;
   top: 12px;
   z-index: 5;
+
   padding: 25px;
-  background: var(--glass-bg);
   border: 1px solid var(--glass-border);
-  border-radius: 16px;
-  backdrop-filter: blur(5px);
+  border-radius: var(--r-xl);
+  backdrop-filter: blur(6px);
+
   margin-bottom: 20px;
   min-height: 250px;
 }
@@ -112,54 +191,29 @@ body {
   align-items: center;
 }
 
-.scan-panel-header h2 {
+.scan-header h2 {
   color: var(--magenta-light);
   font-weight: 600;
 }
 
-.scan-panel-header > button {
-  padding: 0.3em 0.6em;
-  font-size: 28px;
+.scan-header > button {
+  color: var(--magenta-light);
+  font-size: 36px;
+  font-weight: 600;
+  padding: 0 0.6em;
+  background-color: transparent;
 }
-
+.scan-header > button:hover,
+.scan-header > button:focus {
+  border-color: transparent;
+}
 /* ------------------------------------
-   ScanForm — 掃描輸入與按鈕
+   7) ScanForm
 ------------------------------------ */
 .scan-form {
   display: flex;
-  gap: 12px;
+  gap: var(--gap);
   margin-bottom: 16px;
-}
-
-.scan-input {
-  flex: 1;
-  padding: 14px;
-  font-size: 18px;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
-}
-
-.scan-input:focus {
-  outline: none;
-  border-color: var(--magenta-light);
-  background: rgba(255, 255, 255, 0.16);
-}
-
-.scan-btn {
-  padding: 14px 18px;
-  background: var(--magenta);
-  color: #fff;
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: 0.25s;
-}
-
-.scan-btn:hover {
-  background: var(--magenta-light);
 }
 
 .scan-input-wrapper {
@@ -168,6 +222,38 @@ body {
   flex: 1;
 }
 
+.scan-input {
+  flex: 1;
+  padding: 14px;
+  font-size: 18px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--input-border);
+  background: var(--input-bg);
+  color: var(--text-main);
+}
+
+.scan-input:focus {
+  outline: none;
+  border-color: var(--magenta-light);
+  background: var(--input-bg-focus);
+}
+
+.scan-btn {
+  padding: 14px 18px;
+  background: var(--magenta);
+  color: #fff;
+  border: none;
+  border-radius: var(--r-md);
+  cursor: pointer;
+  font-size: 16px;
+  transition: var(--t) ease;
+}
+
+.scan-btn:hover {
+  background: var(--magenta-light);
+}
+
+/* Pop-out message (no layout jump) */
 .scan-pop-message {
   position: absolute;
   top: -6px;
@@ -182,37 +268,41 @@ body {
   background: rgba(0, 0, 0, 0.85);
   color: #fff;
 
-  pointer-events: none; /* ⭐ 不影響輸入 */
-
+  pointer-events: none;
   animation: popFade 0.65s ease-out forwards;
   z-index: 5;
 }
 
+.theme-light .scan-pop-message {
+  background: rgba(0, 0, 0, 0.72);
+}
+
 /* ------------------------------------
-   ScanResult — LED 掃描結果
+   8) ScanResult
 ------------------------------------ */
 .scan-result {
   padding: 18px;
-  border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--r-lg);
+  border: 1px solid var(--glass-border);
   margin-top: 10px;
+  color: var(--text-main);
 }
 
 .scan-result.pass {
   background: rgba(60, 255, 150, 0.1);
-  border-color: rgba(60, 255, 150, 0.4);
+  border-color: rgba(60, 255, 150, 0.35);
   box-shadow: 0 0 10px var(--success-glow);
 }
 
 .scan-result.fail {
   background: rgba(255, 80, 80, 0.1);
-  border-color: rgba(255, 80, 80, 0.4);
+  border-color: rgba(255, 80, 80, 0.35);
   box-shadow: 0 0 10px var(--fail-glow);
 }
 
 .scan-result.empty {
-  background: rgba(255, 255, 255, 0.04);
-  color: #aaa;
+  background: color-mix(in srgb, var(--glass-bg) 65%, transparent);
+  color: var(--text-muted);
 }
 
 .scan-code {
@@ -228,29 +318,22 @@ body {
 .scan-time {
   margin-top: 4px;
   font-size: 14px;
-  color: #bbb;
+  color: var(--text-muted);
 }
 
 /* ------------------------------------
-   Panel
+   9) Panels (Whitelist / History)
 ------------------------------------ */
-.settings-panel {
-  background: var(--bg-panel);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  box-shadow: 0 24px 60px rgba(0,0,0,0.35);
-}
-
 .whitelist-panel,
 .history-panel {
   margin-top: 20px;
   padding: 22px;
+
   background: var(--bg-panel);
   border: 1px solid var(--glass-border);
-  border-radius: 16px;
+  border-radius: var(--r-xl);
   backdrop-filter: blur(10px);
+
   min-width: 365px;
   animation: fadeIn 0.25s ease-out;
 }
@@ -267,6 +350,13 @@ body {
   color: var(--magenta-light);
 }
 
+.panel-actions {
+  display: flex;
+  flex: 1;
+  justify-content: space-around;
+}
+
+/* Close */
 .close-btn {
   padding: 6px 12px;
   background: rgba(187, 38, 73, 0.25);
@@ -274,7 +364,7 @@ body {
   border-radius: 10px;
   cursor: pointer;
   color: #fff;
-  transition: 0.2s;
+  transition: var(--t-fast) ease;
 }
 
 .close-btn:hover {
@@ -284,58 +374,31 @@ body {
 .info-msg {
   display: flex;
   justify-content: space-between;
+  color: var(--text-main);
   margin-top: 10px;
   padding: 10px;
+
   border-left: 4px solid var(--magenta-light);
   background: rgba(187, 38, 73, 0.15);
   border-radius: 6px;
 }
 
+/* ------------------------------------
+   10) Table + horizontal scroll for Whitelist
+------------------------------------ */
 .table-scroll {
   width: 100%;
-  overflow-x: auto; /* ⭐ 橫向捲動 */
+  overflow-x: auto;
   overflow-y: hidden;
 }
 
 .whitelist-table {
-  width: max-content; /* ⭐ 關鍵 */
-  min-width: 100%; /* 至少撐滿 panel */
+  width: max-content;
+  min-width: 100%;
   border-collapse: collapse;
 }
 
-/* ------------------------------------
-   匯入 / 匯出 按鈕（Magenta 版）
------------------------------------- */
-.import-btn,
-.clear-btn {
-  position: relative;
-  padding: 10px 14px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  cursor: pointer;
-  color: #fff;
-  transition: 0.25s;
-}
-
-.import-btn {
-  display: inline-flex; /* 讓它像 button，不會跑版 */
-}
-
-.import-btn:hover,
-.clear-btn:hover,
-.export-history-btn:hover {
-  background: rgba(255, 255, 255, 0.18);
-}
-
-.clear-btn.danger {
-  background: rgba(187, 38, 73, 0.15);
-  border-color: var(--magenta-light);
-}
-
-/* ------------------------------------
-   Table（玻璃化 + Magenta 點綴）
------------------------------------- */
+/* Base table */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -345,27 +408,27 @@ table {
 
 th {
   padding: 10px;
-  background: rgba(255, 255, 255, 0.08);
-  color: #eee;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  background: var(--table-th-bg);
+  color: var(--text-main);
+  border-bottom: 1px solid var(--glass-border);
+  vertical-align: middle;
+  text-align: center;
 }
 
 td {
   padding: 10px;
-  color: #ddd;
+  color: var(--text-main);
+  border-bottom: 1px solid var(--table-td-border);
   vertical-align: middle;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-tr.center {
   text-align: center;
 }
 
-tr.right {
+tr.right td,
+tr.right th {
   text-align: right;
 }
-
-tr.left {
+tr.left td,
+tr.left th {
   text-align: left;
 }
 
@@ -377,14 +440,113 @@ tr.row-fail {
   background: rgba(255, 80, 80, 0.06);
 }
 
-.empty-msg {
+.empty-msg,
+.history-empty {
   padding: 20px;
   text-align: center;
-  color: #aaa;
+  color: var(--text-muted);
 }
 
 /* ------------------------------------
-   動畫
+   11) Buttons (Import / Clear)
+------------------------------------ */
+.import-btn,
+.clear-btn {
+  position: relative;
+  padding: 10px 14px;
+  border-radius: 10px;
+
+  background: var(--btn-bg);
+  border: 1px solid var(--glass-border);
+
+  cursor: pointer;
+  color: var(--text-main);
+  transition: var(--t) ease;
+}
+
+.import-btn {
+  display: inline-flex;
+}
+
+.import-btn:hover,
+.clear-btn:hover {
+  background: var(--btn-bg-hover);
+}
+
+.clear-btn.danger {
+  background: rgba(187, 38, 73, 0.15);
+  border-color: var(--magenta-light);
+}
+
+/* ------------------------------------
+   12) Modal / Popover (unified)
+   - SettingsModal 可以用 .popover-* 或沿用 .settings-*
+   - 遮罩顏色跟主題走（--overlay-bg）
+------------------------------------ */
+.popover-overlay,
+.settings-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: var(--overlay-bg);
+}
+
+/* Glass panel */
+.popover-content,
+.settings-panel {
+  min-width: 320px;
+  max-width: 90vw;
+  max-height: 80vh;
+  width: 100%;
+  padding: 20px;
+  border-radius: var(--r-xl);
+
+  background: var(--glass-bg);
+  color: var(--text-main);
+
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-panel);
+
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+/* Optional: inner panel typography helpers */
+.settings-title {
+  margin: 0 0 12px 0;
+  color: var(--magenta-light);
+}
+
+.settings-section {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--glass-border);
+}
+
+.settings-section-title {
+  margin: 0 0 10px 0;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+}
+
+.settings-label {
+  color: var(--text-main);
+}
+
+/* ------------------------------------
+   13) Animations
 ------------------------------------ */
 @keyframes fadeIn {
   from {
@@ -415,52 +577,32 @@ tr.row-fail {
   }
 }
 
-/* ------------------------------------
-   patch
------------------------------------- */
-.panel-actions {
-  display: flex;
-  flex: 1;
-  justify-content: space-around;
+/* ============================================================
+   Scrollbar (Theme-aware)
+============================================================ */
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
 }
 
-/* ------------------------------------
-   Light Theme Overrides
------------------------------------- */
-.theme-light {
-  --bg-main: #f5f5f5;
-  --text-main: #1b1b1b;
-
-  --glass-bg: rgba(0, 0, 0, 0.04);
-  --glass-border: rgba(0, 0, 0, 0.12);
+/* WebKit (Chrome / Edge / Tauri) */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
 }
 
-/* ===== Settings Modal ===== */
-
-.settings-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  background: rgba(0, 0, 0, 0.45);
+::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
 }
 
-.settings-panel {
-  min-width: 320px;
-  max-width: 90vw;
-  max-height: 80vh;
+::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb);
+  border-radius: 10px;
+  border: 2px solid var(--scrollbar-track);
+}
 
-  padding: 20px;
-  border-radius: 16px;
-
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  box-shadow: 0 24px 60px rgba(0,0,0,0.35);
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--scrollbar-thumb-hover);
 }

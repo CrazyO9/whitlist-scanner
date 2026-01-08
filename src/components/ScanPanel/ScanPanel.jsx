@@ -1,12 +1,8 @@
 // whitelist-scanner/src/components/ScanPanel.jsx
-import "./Popover.css"
 import { useState, useEffect } from "react";
 import ScanForm from "./ScanForm";
 import ScanResult from "./ScanResult";
-import ScanSettings from "../SettingsButton/SettingsButton";
 import { useScanSound } from "../../hooks/useScanSound";
-import { usePreferencesContext } from "../../context/PreferencesContext";
-import SettingsModal from "../SettingsButton/SettingsModal";
 
 export default function ScanPanel({
   scanner, // useScanner 回傳物件
