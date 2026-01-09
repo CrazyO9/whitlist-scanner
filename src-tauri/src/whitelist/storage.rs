@@ -97,7 +97,7 @@ pub async fn clear_last_whitelist(app: AppHandle) -> Result<(), String> {
     // 刪 last 指標
     fs::remove_file(&last_path).map_err(|e| e.to_string())?;
 
-    // 可選：一併刪除 json 快取
+    // 一併刪除 json 快取
     let json_path = dir.join(format!("{}.json", key));
     if json_path.exists() {
         let _ = fs::remove_file(json_path);

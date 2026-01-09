@@ -12,7 +12,7 @@ pub use export_whitelist::{ export_whitelist_csv, export_whitelist_xlsx };
 
 // ===== storage =====
 pub mod storage;
-pub use storage::{ save_whitelist, load_whitelist, load_last_whitelist };
+pub use storage::{ save_whitelist, load_whitelist, load_last_whitelist, clear_last_whitelist };
 
 // ===== model =====
 pub mod model;

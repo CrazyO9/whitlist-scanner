@@ -12,7 +12,8 @@ use whitelist::{
     save_whitelist, 
     load_whitelist,
     reveal_in_folder,
-    load_last_whitelist
+    load_last_whitelist,
+    clear_last_whitelist,
 };
 // use tauri::Manager;
 
@@ -35,6 +36,7 @@ fn main() {
             save_whitelist,
             load_whitelist,
             load_last_whitelist,
+            clear_last_whitelist,
 
             // utils
             reveal_in_folder,

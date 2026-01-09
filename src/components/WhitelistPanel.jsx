@@ -74,9 +74,9 @@ export default function WhitelistPanel({
         <div className="panel-actions">
           <WhitelistImport handle_imported={handleImportedWithReset} />
           <WhitelistExport whiteTable={whiteTable} resetKey={resetKey} />
-          {/* <button className="clear-btn danger" onClick={try_action}>
+          <button className="clear-btn danger" onClick={try_action}>
             {isConfirming ? "確認" : "清空"}
-          </button> */}
+          </button>
         </div>
       </div>
 
